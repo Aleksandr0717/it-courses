@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
-import { useUserStore } from '@/stores/UserStore.js';
 
 const checkAuth = (): boolean | object => {
-  const userStore = useUserStore();
   if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) return { name: 'Home' };
   return true;
 };

@@ -43,7 +43,7 @@ onMounted(() => {
   const sessionStorageUser = sessionStorage.getItem("currentUser")
   if (!localStorageUser && !sessionStorageUser) {
     unRegisteredUser.value = true;
-  } 
+  }
   if (localStorageUser) {
     unRegisteredUser.value = false;
     userStore.INIT_CURRENT_USER(parseInt(JSON.parse(localStorageUser)));
@@ -54,7 +54,7 @@ onMounted(() => {
   }
 })
 
-watch(currentUser, (newValue) => {
+watch(currentUser, (newValue: object) => {
   console.log('watch currentUser ', newValue);
   if (Object.keys(newValue)?.length) unRegisteredUser.value = false;
   else {
