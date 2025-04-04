@@ -22,7 +22,7 @@ class UserService {
 
   // Создать нового пользователя
   async createUser(userData) {
-    return fetchData(`${API_BASE_URL}/users`, {
+    return fetchData(`${API_BASE_URL}/users/register`, {
       method: "POST",
       body: JSON.stringify(userData),
     });

@@ -22,12 +22,16 @@ export const useUserStore = defineStore('userStore', () => {
       })
   }
 
-  const INIT_AUTORIZATION = async (usersInfo) => {
+  const INIT_AUTORIZATION = async (usersInfo, rememberUser) => {
     await userService
       .authorizationUser(usersInfo.login, usersInfo.password)
       .then((response) => {
         alert(response.message)
-        localStorage.setItem('currentUser', JSON.stringify(response.user.id))
+        if (rememberUser) {
+          localStorage.setItem('currentUser', JSON.stringify(response.user.id))
+        } else {
+          sessionStorage.setItem('currentUser', JSON.stringify(response.user.id))
+        }
         INIT_CURRENT_USER(response.user.id)
       })
       .catch((error) => {
@@ -36,14 +40,35 @@ export const useUserStore = defineStore('userStore', () => {
       })
   }
 
+  const INIT_CREATE_NEW_USER = async (userData) => {
+    await userService
+      .createUser({
+        Name: '',
+        LastName: '',
+        SecondName: '',
+        Login: userData.login,
+        Password: userData.password,
+        Email: userData.email,
+      })
+      .then((response) => {
+        alert(response.message);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Ошибка регистрации');
+      });
+  };
+
   const INIT_LOGOUT = async () => {
     localStorage.removeItem('currentUser')
+    sessionStorage.removeItem('currentUser')
     SET_CURRENT_USER({})
   }
 
   return {
     currentUser,
     SET_CURRENT_USER,
+    INIT_CREATE_NEW_USER,
     INIT_CURRENT_USER,
     INIT_AUTORIZATION,
     INIT_LOGOUT,

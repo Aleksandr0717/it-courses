@@ -40,12 +40,17 @@ const profileMenu = ref(false)
 
 onMounted(() => {
   const localStorageUser = localStorage.getItem("currentUser");
-  if (!localStorageUser) {
+  const sessionStorageUser = sessionStorage.getItem("currentUser")
+  if (!localStorageUser && !sessionStorageUser) {
     unRegisteredUser.value = true;
-   
-  } else {
+  } 
+  if (localStorageUser) {
     unRegisteredUser.value = false;
     userStore.INIT_CURRENT_USER(parseInt(JSON.parse(localStorageUser)));
+  }
+  if (sessionStorageUser) {
+    unRegisteredUser.value = false;
+    userStore.INIT_CURRENT_USER(parseInt(JSON.parse(sessionStorageUser)));
   }
 })
 
@@ -166,9 +171,7 @@ watch(currentUser, (newValue) => {
       </v-card>
     </v-menu>
   </v-app-bar>
-  <RegForm v-model="autorizationVisible" />
-  <!-- v-model:visible-form="autorizationVisible"
-  @update-visible-form="(newValue) => autorizationVisible = newValue" -->
+  <RegForm v-model:localVisibleForm="autorizationVisible" v-model:profile-menu="profileMenu" />
 </template>
 
 <style lang="scss" scoped>

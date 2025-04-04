@@ -108,4 +108,26 @@ router.get("/:userId", (req, res) => {
             }
         })
 })
+router.post("/register", (req, res) =>{
+    console.log(req)
+
+    airtable.create([
+        {
+          fields: {
+            Name: "Иван",
+            LastName: "Сидоров",
+            SecondName: "Николаевич",
+            Login: "Sidorov",
+            Password: "123456",
+            Email: "uhinu@bnhhnuj.cvom"
+          }
+        },
+    ])
+    .then(resp => {
+
+        console.log(resp)
+            return res.status(200).json("");
+      
+    })
+})
 export default router;

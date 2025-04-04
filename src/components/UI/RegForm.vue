@@ -5,20 +5,6 @@ import type { ITabs } from '@/interfaces'
 import { useForm } from 'vee-validate'
 import { regExpForEmail } from '@/use/ValidationForms'
 
-// const props = defineProps<{
-//   visibleForm: boolean
-// }>()
-// const emit = defineEmits(['updateVisibleForm'])
-
-// const localVisibleForm = computed<boolean>({
-//   get: () => {
-//     return props.visibleForm
-//   },
-//   set: (newValue: boolean) => {
-//     emit('updateVisibleForm', newValue)
-//   },
-// })
-
 const {
   handleSubmit: regHandleSubmit,
   isSubmitting: isRegSubmitting,
@@ -75,22 +61,27 @@ const [checkPersonalData, checkPersonalDataAttrs] = regDefineField('checkPersona
 const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
 const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
 
-const onRegSubmit = regHandleSubmit((values) => {
-  // создать нового пользователя
-  localVisibleForm.value = false
-  resetRegForm()
-  resetLoginForm()
+
+const onRegSubmit = regHandleSubmit( async (values) => {
+  await userStore.INIT_CREATE_NEW_USER({login: regUsername.value, password: regPassword.value, email: regEmail.value})
+  .finally(() => {
+    localVisibleForm.value = false
+    resetRegForm()
+    resetLoginForm()
+    profileMenu.value = false
+  })
 })
 
 const onLoginSubmit = loginHandleSubmit(async (values) => {
   loading.value = true
-  await userStore.INIT_AUTORIZATION({login: loginUsername.value, password: loginPassword.value})
+  await userStore.INIT_AUTORIZATION({login: loginUsername.value, password: loginPassword.value}, checkRememberMe.value)
     .finally(() => {
       localVisibleForm.value = false
       resetRegForm()
       resetLoginForm()
       loading.value = false
       tab.value = 1
+      profileMenu.value = false
     })
 })
 
@@ -107,11 +98,11 @@ const tabsArray = ref<ITabs[]>([
 ])
 
 const userStore = useUserStore()
-const localVisibleForm = defineModel<boolean>()
+const localVisibleForm = defineModel<boolean>('localVisibleForm')
+const profileMenu = defineModel<boolean>('profileMenu')
 const checkRememberMe = ref(false)
 const tab = ref<number | null>(null)
 const loading = ref(false)
-
 </script>
 
 <template>
@@ -136,15 +127,19 @@ const loading = ref(false)
           </v-tab>
         </v-tabs>
         <v-spacer></v-spacer>
-        <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text"> </v-btn>
+        <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text">
+        </v-btn>
       </div>
       <hr />
       <v-tabs-window v-model="tab">
         <v-tabs-window-item :value="1">
-          <v-form class="mt-4 d-flex justify-center ga-4 flex-column" @submit.prevent="onRegSubmit">
+          <v-form
+            class="mt-4 d-flex justify-center ga-4 flex-column"
+            @submit.prevent="onRegSubmit"
+          >
             <v-text-field
               class="search align-center py-0 ml-3"
-              label="Введите имя пользователя"
+              label="Введите логин"
               variant="outlined"
               max-width="330"
               hide-details="auto"
@@ -212,7 +207,7 @@ const loading = ref(false)
           >
             <v-text-field
               class="search align-center py-0 ml-3"
-              label="Введите имя пользователя"
+              label="Введите логин"
               variant="outlined"
               max-width="330"
               bg-color="#FFFFFF4D"
