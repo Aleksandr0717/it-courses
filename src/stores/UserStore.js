@@ -13,7 +13,10 @@ export const useUserStore = defineStore('userStore', () => {
     await userService
       .getUserById(userId)
       .then((response) => {
-        response.fullShortName = response.lastName + ' ' + response.name[0] + '.' + response.secondName[0] + '.'
+        if (response.name && response.lastName && response.secondName) {
+          response.fullShortName =
+            response.lastName + ' ' + response.name[0] + '.' + response.secondName[0] + '.'
+        } else response.fullShortName = response.login
         SET_CURRENT_USER(response)
       })
       .catch((error) => {
@@ -41,25 +44,55 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   const INIT_CREATE_NEW_USER = async (userData) => {
-    await userService
-      .createUser({
-        Name: '',
-        LastName: '',
-        SecondName: '',
-        Login: userData.login,
-        Password: userData.password,
-        Email: userData.email,
-      })
-      .then((response) => {
-        alert(response.message);
-      })
-      .catch((error) => {
-        console.error(error);
-        alert('Ошибка регистрации');
-      });
+    try {
+      const userPayload = {
+        fields: {
+          Name: '',
+          LastName: '',
+          SecondName: '',
+          Login: userData.login,
+          Password: userData.password,
+          Email: userData.email,
+          City: '',
+          Education: '',
+          AboutMe: '',
+        } 
+      }
+      const response = await userService.createUser(userPayload);
+      alert(response.message);
+      return response;
+    } catch (error) {
+      console.error('Ошибка при создании пользователя: ', error.message);
+      alert(error.message);
+    }
+  };
+  
+  const INIT_UPDATE_USER = async (userData) => {
+    try {
+      const userPayload = {
+        id: userData.customId,
+        fields: {
+          Name: userData.name || '',
+          LastName: userData.lastName || '',
+          SecondName: userData.secondName || '',
+          Login: userData.login,
+          Password: userData.password,
+          Email: userData.email,
+          City: userData.city || '',
+          Education: userData.education || '',
+          AboutMe: userData.aboutMe || '',
+        }
+      }
+      const response = await userService.updateUserData(userPayload);
+      alert(response.message);
+      return response;
+    } catch (error) {
+      console.error('Ошибка при обновлении данных пользователя: ', error.message);
+      alert(error.message);
+    }
   };
 
-  const INIT_LOGOUT = async () => {
+  const INIT_LOGOUT = () => {
     localStorage.removeItem('currentUser')
     sessionStorage.removeItem('currentUser')
     SET_CURRENT_USER({})
@@ -71,6 +104,7 @@ export const useUserStore = defineStore('userStore', () => {
     INIT_CREATE_NEW_USER,
     INIT_CURRENT_USER,
     INIT_AUTORIZATION,
+    INIT_UPDATE_USER,
     INIT_LOGOUT,
   }
 })

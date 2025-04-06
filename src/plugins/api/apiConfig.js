@@ -5,12 +5,10 @@ export const API_BASE_URL = "http://localhost:3000/api"; // Базовый URL �
 export async function fetchData(url, options = {}) {
   try {
     const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-      },
       ...options,
-    });
-
+    })
+    .catch(error => console.error('Произошла ошибка:', error));    
+    
     if (!response.ok) {
       throw new Error({
         ...response,

@@ -22,8 +22,21 @@ class UserService {
 
   // Создать нового пользователя
   async createUser(userData) {
-    return fetchData(`${API_BASE_URL}/users/register`, {
+    return fetchData(`${API_BASE_URL}/users`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async updateUserData(userData) {
+    return fetchData(`${API_BASE_URL}/users`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(userData),
     });
   }

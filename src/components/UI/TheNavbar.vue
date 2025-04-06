@@ -55,7 +55,6 @@ onMounted(() => {
 })
 
 watch(currentUser, (newValue: object) => {
-  console.log('watch currentUser ', newValue);
   if (Object.keys(newValue)?.length) unRegisteredUser.value = false;
   else {
     console.log(newValue);
@@ -171,7 +170,7 @@ watch(currentUser, (newValue: object) => {
       </v-card>
     </v-menu>
   </v-app-bar>
-  <RegForm v-model:localVisibleForm="autorizationVisible" v-model:profile-menu="profileMenu" />
+  <RegForm v-model:localVisibleForm="autorizationVisible" v-model:profileMenu="profileMenu" />
 </template>
 
 <style lang="scss" scoped>

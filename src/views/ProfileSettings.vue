@@ -6,7 +6,16 @@ import { regExpForEmail } from '@/use/ValidationForms';
 import { useUserStore } from '@/stores/UserStore.js';
 
 const userStore = useUserStore();
-const currentUser = computed(() => userStore.currentUser);
+const currentUser = computed({
+  get() {
+    const editUser = Object.assign(userStore.currentUser)
+    return editUser
+  },
+  set(value) {
+    currentUser.value = value
+  }
+}) 
+
 
 const educationLevels = ref<string[]>([
   'Основное общее',
@@ -32,18 +41,23 @@ const navLinks = ref<INavLink[]>([
     title: 'Изменить почту',
     to: { name: 'Settings', params: { userData: 'email' } },
     addClass: true,
-    action: () => passwordResetForm(),
+    action: () => {
+      passwordResetForm(),
+      isDisabledPersonalData.value = true
+    }
   },
   {
     id: 3,
     title: 'Изменить пароль',
     to: { name: 'Settings', params: { userData: 'password' } },
     addClass: true,
-    action: () => emailResetForm(),
+    action: () => {
+      emailResetForm(),
+      isDisabledPersonalData.value = true
+    }
   },
 ]);
 
-const isDisabledPersonalData = ref(true);
 
 const {
   handleSubmit: emailHandleSubmit,
@@ -68,13 +82,12 @@ const {
   validationSchema: {
     currentPassword(value: string): string | boolean {
       if (!value?.length) return 'Введите текущий пароль';
+      else if (value !== currentUser.value.password) return 'Неверный текущий пароль';
       return true;
     },
     password(value: string): string | boolean {
-      if (!value?.length && currentPassword.value)
-        return 'Введите новый пароль';
-      else if (value?.length < 6)
-        return 'Пароль должен содержать не менее 6 символов';
+      if (!value?.length && currentPassword.value) return 'Введите новый пароль';
+      else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов';
       return true;
     },
     repeatedPassword(value: string): string | boolean {
@@ -85,43 +98,45 @@ const {
 });
 
 const [newEmail, newEmailAttrs] = emailDefineField('newEmail');
-const [currentPassword, currentPasswordAttrs] =
-  passwordDefineField('currentPassword');
+const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword');
 const [newPassword, newPasswordAttrs] = passwordDefineField('password');
-const [repeatedPassword, repeatedPasswordAttrs] =
-  passwordDefineField('repeatedPassword');
+const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword');
 
-const savePersonalDataChange = (): void => {
+const savePersonalDataChange = async () => {
+  await userStore.INIT_UPDATE_USER(currentUser.value)
   isDisabledPersonalData.value = true;
-  alert('Изменения сохранены');
+  console.log(currentUser.value);
+  
 };
 
-const saveEmailChange = emailHandleSubmit((values) => {
-  editUser.email = newEmail.value;
+const saveEmailChange = emailHandleSubmit(async (values) => {
+  currentUser.value.email = newEmail.value;
   emailResetForm();
-  alert('Изменения сохранены');
+  await userStore.INIT_UPDATE_USER(currentUser.value)
 });
 
-const savePasswordChange = passwordHandleSubmit((values) => {
-  console.log(values);
+const savePasswordChange = passwordHandleSubmit(async (values) => {
+  currentUser.value.password = newPassword.value;
   passwordResetForm();
-  alert('Изменения сохранены');
+  await userStore.INIT_UPDATE_USER(currentUser.value)
 });
 
-const editUser = currentUser.value;
-const onEditFields = () => {
+const isDisabledPersonalData = ref(true);
+//const editUser = currentUser.value;
+
+const onEditFields = async () => {
   isDisabledPersonalData.value = false;
 };
 </script>
 
 <template>
-  <div class="main d-flex">
+  <div class="main d-flex justify-center">
     <div class="back-btn">
       <v-btn
         variant="text"
         tile
-        width="300"
-        height="803"
+        width="40"
+        height="30"
         icon="mdi-arrow-left"
         @click="$router.back()"
       />
@@ -136,10 +151,10 @@ const onEditFields = () => {
       </div>
       <div class="editable-item">
         <label style="margin-right: 103px;" for="name">Имя:</label>
-        <p v-if="isDisabledPersonalData">{{ editUser.name }}</p>
+        <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
         <v-text-field
           v-else
-          v-model="editUser.name"
+          v-model="currentUser.name"
           variant="outlined"
           hide-details
           max-width="545"
@@ -149,10 +164,10 @@ const onEditFields = () => {
       </div>
       <div class="editable-item">
         <label style="margin-right: 65px;" for="fam">Фамилия:</label>
-        <p v-if="isDisabledPersonalData">{{ editUser.lastName }}</p>
+        <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
         <v-text-field
           v-else
-          v-model="editUser.lastName"
+          v-model="currentUser.lastName"
           variant="outlined"
           hide-details
           max-width="545"
@@ -161,11 +176,24 @@ const onEditFields = () => {
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 91px;" for="city">Город:</label>
-        <p v-if="isDisabledPersonalData">{{ editUser.city }}</p>
+        <label style="margin-right: 63px;" for="fam">Отчество:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
         <v-text-field
           v-else
-          v-model="editUser.city"
+          v-model="currentUser.secondName"
+          variant="outlined"
+          hide-details
+          max-width="545"
+          density="comfortable"
+          clearable     
+        ></v-text-field>
+      </div>
+      <div class="editable-item">
+        <label style="margin-right: 90px;" for="city">Город:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
+        <v-text-field
+          v-else
+          v-model="currentUser.city"
           variant="outlined"
           hide-details
           max-width="545"
@@ -174,11 +202,11 @@ const onEditFields = () => {
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label class="mr-9" for="education">Образование:</label>
-        <p v-if="isDisabledPersonalData">{{ editUser.education }}</p>
+        <label style="margin-right: 34px;" for="education">Образование:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
         <v-autocomplete
         v-else
-        v-model="editUser.education"
+        v-model="currentUser.education"
         max-width="330"
         clearable
         density="comfortable"
@@ -189,23 +217,23 @@ const onEditFields = () => {
         open-on-clear
         ></v-autocomplete>
       </div>
-      <div class="editable-item">
-        <label style="margin-right: 73px;" for="about">Обо мне:</label>
-        <p v-if="isDisabledPersonalData">{{ editUser.aboutMe }}</p>
+      <div class="editable-item align-start">
+        <label style="margin-right: 71px;" for="about">Обо мне:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
         <v-textarea
           v-else
-          v-model="editUser.aboutMe"
+          v-model="currentUser.aboutMe"
           variant="outlined"
           hide-details="auto"
           maxlength="255"
           counter="255"
           auto-grow
           max-width="545"
-          min-width="545"
           clearable
         ></v-textarea>
       </div>
       <v-btn
+        v-if="isDisabledPersonalData"
         class="btn text-none mt-5"
         width="250"
         height="45"
@@ -216,6 +244,7 @@ const onEditFields = () => {
         Редактировать информацию
       </v-btn>
       <v-btn
+        v-else
         class="btn text-none mt-5"
         width="200"
         height="45"
@@ -237,7 +266,7 @@ const onEditFields = () => {
       <v-form @submit.prevent="saveEmailChange">
         <div class="editable-item ga-6">
           <label for="current-email">Текущий e-mail:</label>
-          <p >{{ editUser.email }}</p>
+          <p >{{ currentUser.email }}</p>
         </div>
         <div class="editable-item ga-9">
           <label for="new-email">Новый e-mail:</label>
@@ -343,50 +372,46 @@ const onEditFields = () => {
 </template>
 
 <style scoped lang="scss">
-.main {
-  margin: {
-    right: 200px;
+.back-btn {
+  margin-top: 27px;
+  width: 40px;
+  height: 30px;
+  background-color: rgb(233, 233, 233);
+}
+.editable-items {
+  width: 40%;
+  .editable-item {
+    display: flex;
+    margin-top: 25px;
+    align-items: center;
+    padding-inline: 50px;
+    justify-content: start;
   }
-  .back-btn {
-    width: 15%;
-    background-color: rgb(233, 233, 233);
+  .btn {
+    margin-left: 50px;
+    letter-spacing: 0;
+    font-size: 16px;
   }
-  .editable-items {
-    width: 46%;
-    margin-left: 200px;
-    .editable-item {
-      display: flex;
-      margin-top: 25px;
-      align-items: center;
-      padding-inline: 50px;
-      justify-content: start;
-    }
-    .btn {
-      margin-left: 50px;
-      letter-spacing: 0;
-      font-size: 16px;
-    }
+}
+.nav-links {
+  width: 15%;
+  padding: {
+    inline: 50px;
+    top: 20px;
   }
-  .nav-links {
-    width: 15%;
-    padding: {
-      inline: 50px;
-      top: 20px;
-    }
-    .nav-link {
-      color: green;
-      text-decoration: none;
-      &:hover {
-        border-bottom: 1px solid;
-      }
-      &:active {
-        opacity: 0.7;
-        border: 0;
-      }
-    }
-    .nav-link-active {
+  .nav-link {
+    color: green;
+    text-decoration: none;
+    &:hover {
       border-bottom: 1px solid;
     }
+    &:active {
+      opacity: 0.7;
+      border: 0;
+    }
+  }
+  .nav-link-active {
+    border-bottom: 1px solid;
   }
 }
 </style>

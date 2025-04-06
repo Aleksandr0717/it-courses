@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/UserStore.js'
 import { ref } from 'vue'
 import type { ITabs } from '@/interfaces'
 import { useForm } from 'vee-validate'
-import { regExpForEmail } from '@/use/ValidationForms'
+import { regExpForEmail, RegExpForLogin } from '@/use/ValidationForms'
 
 const {
   handleSubmit: regHandleSubmit,
@@ -20,6 +20,7 @@ const {
     },
     regUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
+      else if (!RegExpForLogin.test(value)) return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
     regPassword(value: string): string | boolean {
@@ -44,6 +45,7 @@ const {
   validationSchema: {
     loginUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
+      else if (!RegExpForLogin.test(value)) return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
     loginPassword(value: string): string | boolean {
