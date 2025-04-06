@@ -21,7 +21,6 @@ export const useUserStore = defineStore('userStore', () => {
       })
       .catch((error) => {
         console.error(error)
-        alert('Ошибка авторизации')
       })
   }
 
@@ -39,7 +38,7 @@ export const useUserStore = defineStore('userStore', () => {
       })
       .catch((error) => {
         console.error(error)
-        alert('Ошибка авторизации')
+        alert('Неверный логин или пароль')
       })
   }
 
@@ -92,6 +91,17 @@ export const useUserStore = defineStore('userStore', () => {
     }
   };
 
+  const INIT_DELETE_USER = async (userData) => {
+    try {
+      const response = await userService.deleteUser(userData);
+      alert(response.message);
+      return response;
+    } catch (error) {
+      console.error('Ошибка при удалении пользователя: ', error.message);
+      alert(error.message);
+    }
+  };
+
   const INIT_LOGOUT = () => {
     localStorage.removeItem('currentUser')
     sessionStorage.removeItem('currentUser')
@@ -105,6 +115,7 @@ export const useUserStore = defineStore('userStore', () => {
     INIT_CURRENT_USER,
     INIT_AUTORIZATION,
     INIT_UPDATE_USER,
+    INIT_DELETE_USER,
     INIT_LOGOUT,
   }
 })

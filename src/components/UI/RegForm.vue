@@ -64,17 +64,17 @@ const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
 const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
 
 
-const onRegSubmit = regHandleSubmit( async (values) => {
+const onRegSubmit = regHandleSubmit( async () => {
   await userStore.INIT_CREATE_NEW_USER({login: regUsername.value, password: regPassword.value, email: regEmail.value})
   .finally(() => {
-    localVisibleForm.value = false
+    tab.value = 2
     resetRegForm()
     resetLoginForm()
     profileMenu.value = false
   })
 })
 
-const onLoginSubmit = loginHandleSubmit(async (values) => {
+const onLoginSubmit = loginHandleSubmit(async () => {
   loading.value = true
   await userStore.INIT_AUTORIZATION({login: loginUsername.value, password: loginPassword.value}, checkRememberMe.value)
     .finally(() => {
@@ -238,7 +238,7 @@ const loading = ref(false)
             </v-text-field>
             <div class="form-submit d-flex justify-space-between align-center">
               <v-checkbox
-                class="ml-3"
+                class="ml-1"
                 label="Запомнить меня"
                 v-model="checkRememberMe"
                 color="blue"
@@ -246,7 +246,7 @@ const loading = ref(false)
                 density="compact"
               ></v-checkbox>
               <v-btn
-                class="form-btn text-none px-0 mr-3"
+                class="form-btn text-none px-0 mr-1"
                 width="100"
                 height="30"
                 color="blue"

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import type { INavLink } from '@/interfaces';
-import { useForm } from 'vee-validate';
-import { regExpForEmail } from '@/use/ValidationForms';
-import { useUserStore } from '@/stores/UserStore.js';
+import { ref, computed } from 'vue'
+import type { INavLink } from '@/interfaces'
+import { useForm } from 'vee-validate'
+import { regExpForEmail } from '@/use/ValidationForms'
+import { useUserStore } from '@/stores/UserStore.js'
+import { useRouter } from 'vue-router'
 
-const userStore = useUserStore();
+const router = useRouter()
+const userStore = useUserStore()
 const currentUser = computed({
   get() {
     const editUser = Object.assign(userStore.currentUser)
@@ -13,9 +15,8 @@ const currentUser = computed({
   },
   set(value) {
     currentUser.value = value
-  }
-}) 
-
+  },
+})
 
 const educationLevels = ref<string[]>([
   'Основное общее',
@@ -24,7 +25,7 @@ const educationLevels = ref<string[]>([
   'Бакалавриат',
   'Специалитет',
   'Магистратура',
-]);
+])
 const navLinks = ref<INavLink[]>([
   {
     id: 1,
@@ -32,8 +33,8 @@ const navLinks = ref<INavLink[]>([
     to: { name: 'Settings', params: { userData: 'personal' } },
     addClass: false,
     action: () => {
-      emailResetForm();
-      passwordResetForm();
+      emailResetForm()
+      passwordResetForm()
     },
   },
   {
@@ -42,9 +43,8 @@ const navLinks = ref<INavLink[]>([
     to: { name: 'Settings', params: { userData: 'email' } },
     addClass: true,
     action: () => {
-      passwordResetForm(),
-      isDisabledPersonalData.value = true
-    }
+      passwordResetForm(), (isDisabledPersonalData.value = true)
+    },
   },
   {
     id: 3,
@@ -52,12 +52,10 @@ const navLinks = ref<INavLink[]>([
     to: { name: 'Settings', params: { userData: 'password' } },
     addClass: true,
     action: () => {
-      emailResetForm(),
-      isDisabledPersonalData.value = true
-    }
+      emailResetForm(), (isDisabledPersonalData.value = true)
+    },
   },
-]);
-
+])
 
 const {
   handleSubmit: emailHandleSubmit,
@@ -67,11 +65,11 @@ const {
 } = useForm({
   validationSchema: {
     newEmail(value: string): string | boolean {
-      if (!regExpForEmail.test(value)) return 'Введите корректный e-mail';
-      return true;
+      if (!regExpForEmail.test(value)) return 'Введите корректный e-mail'
+      return true
     },
   },
-});
+})
 
 const {
   handleSubmit: passwordHandleSubmit,
@@ -81,52 +79,58 @@ const {
 } = useForm({
   validationSchema: {
     currentPassword(value: string): string | boolean {
-      if (!value?.length) return 'Введите текущий пароль';
-      else if (value !== currentUser.value.password) return 'Неверный текущий пароль';
-      return true;
+      if (!value?.length) return 'Введите текущий пароль'
+      else if (value !== currentUser.value.password) return 'Неверный текущий пароль'
+      return true
     },
     password(value: string): string | boolean {
-      if (!value?.length && currentPassword.value) return 'Введите новый пароль';
-      else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов';
-      return true;
+      if (!value?.length && currentPassword.value) return 'Введите новый пароль'
+      else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов'
+      return true
     },
     repeatedPassword(value: string): string | boolean {
-      if (value !== newPassword.value) return 'Пароли не совпадают';
-      return true;
+      if (value !== newPassword.value) return 'Пароли не совпадают'
+      return true
     },
   },
-});
+})
 
-const [newEmail, newEmailAttrs] = emailDefineField('newEmail');
-const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword');
-const [newPassword, newPasswordAttrs] = passwordDefineField('password');
-const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword');
+const [newEmail, newEmailAttrs] = emailDefineField('newEmail')
+const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword')
+const [newPassword, newPasswordAttrs] = passwordDefineField('password')
+const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword')
 
-const savePersonalDataChange = async () => {
+const savePersonalDataChange = async (): Promise<void> => {
   await userStore.INIT_UPDATE_USER(currentUser.value)
-  isDisabledPersonalData.value = true;
-  console.log(currentUser.value);
-  
-};
+  isDisabledPersonalData.value = true
+  console.log(currentUser.value)
+}
 
-const saveEmailChange = emailHandleSubmit(async (values) => {
-  currentUser.value.email = newEmail.value;
-  emailResetForm();
+const saveEmailChange = emailHandleSubmit(async () => {
+  currentUser.value.email = newEmail.value
+  emailResetForm()
   await userStore.INIT_UPDATE_USER(currentUser.value)
-});
+})
 
-const savePasswordChange = passwordHandleSubmit(async (values) => {
-  currentUser.value.password = newPassword.value;
-  passwordResetForm();
+const savePasswordChange = passwordHandleSubmit(async () => {
+  currentUser.value.password = newPassword.value
+  passwordResetForm()
   await userStore.INIT_UPDATE_USER(currentUser.value)
-});
+})
 
-const isDisabledPersonalData = ref(true);
-//const editUser = currentUser.value;
+const isDisabledPersonalData = ref(true)
+const confirmDialog = ref(false)
 
-const onEditFields = async () => {
-  isDisabledPersonalData.value = false;
-};
+const deleteAccount = async (): Promise<void> => {
+  confirmDialog.value = false
+  await userStore.INIT_DELETE_USER(currentUser.value)
+  userStore.INIT_LOGOUT()
+  router.push({ name: 'Home' })
+}
+
+const onEditFields = () => {
+  isDisabledPersonalData.value = false
+}
 </script>
 
 <template>
@@ -141,16 +145,13 @@ const onEditFields = async () => {
         @click="$router.back()"
       />
     </div>
-    <div
-      v-if="$route.params.userData === 'personal'"
-      class="editable-items mt-7"
-    >
+    <div v-if="$route.params.userData === 'personal'" class="editable-items mt-7">
       <div class="header text-center d-flex flex-column">
         <h3>Личная информация</h3>
         <VDivider opacity=".3" />
       </div>
       <div class="editable-item">
-        <label style="margin-right: 103px;" for="name">Имя:</label>
+        <label style="margin-right: 103px" for="name">Имя:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
         <v-text-field
           v-else
@@ -163,7 +164,7 @@ const onEditFields = async () => {
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 65px;" for="fam">Фамилия:</label>
+        <label style="margin-right: 65px" for="fam">Фамилия:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
         <v-text-field
           v-else
@@ -172,11 +173,11 @@ const onEditFields = async () => {
           hide-details
           max-width="545"
           density="comfortable"
-          clearable     
+          clearable
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 63px;" for="fam">Отчество:</label>
+        <label style="margin-right: 63px" for="fam">Отчество:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
         <v-text-field
           v-else
@@ -185,11 +186,11 @@ const onEditFields = async () => {
           hide-details
           max-width="545"
           density="comfortable"
-          clearable     
+          clearable
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 90px;" for="city">Город:</label>
+        <label style="margin-right: 90px" for="city">Город:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
         <v-text-field
           v-else
@@ -202,23 +203,23 @@ const onEditFields = async () => {
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 34px;" for="education">Образование:</label>
+        <label style="margin-right: 34px" for="education">Образование:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
         <v-autocomplete
-        v-else
-        v-model="currentUser.education"
-        max-width="330"
-        clearable
-        density="comfortable"
-        hide-details
-        placeholder="Выберите уровень образования"
-        :items="educationLevels"
-        variant="outlined"
-        open-on-clear
+          v-else
+          v-model="currentUser.education"
+          max-width="330"
+          clearable
+          density="comfortable"
+          hide-details
+          placeholder="Выберите уровень образования"
+          :items="educationLevels"
+          variant="outlined"
+          open-on-clear
         ></v-autocomplete>
       </div>
       <div class="editable-item align-start">
-        <label style="margin-right: 71px;" for="about">Обо мне:</label>
+        <label style="margin-right: 71px" for="about">Обо мне:</label>
         <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
         <v-textarea
           v-else
@@ -254,11 +255,40 @@ const onEditFields = async () => {
       >
         Сохранить изменения
       </v-btn>
+      <v-btn
+        v-if="isDisabledPersonalData"
+        class="btn text-none mt-5"
+        width="150"
+        height="45"
+        color="red"
+        flat
+        @click="confirmDialog = true"
+      >
+        Удалить аккаунт
+      </v-btn>
+      <v-dialog v-model="confirmDialog" max-width="500" persistent>
+        <v-card>
+          <v-card-title class="ml-2 d-flex align-center justify-space-between">
+            Подтверждение
+              <v-btn variant="text" icon="mdi-close" size="30" @click="confirmDialog = false"></v-btn>
+          </v-card-title>
+          <v-card-text>
+            Удаление аккаунта приведет к потере прогресса в курсах. Вы точно хотите удалить аккаунт?
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              class="text-none mr-2"
+              style="letter-spacing: 0; font-size: 16px"
+              variant="flat"
+              color="red"
+              @click="deleteAccount"
+              >Удалить</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
-    <div
-      v-else-if="$route.params.userData === 'email'"
-      class="editable-items mt-7"
-    >
+    <div v-else-if="$route.params.userData === 'email'" class="editable-items mt-7">
       <div class="header text-center d-flex flex-column">
         <h3>Изменение почты</h3>
         <VDivider opacity=".3" />
@@ -266,7 +296,7 @@ const onEditFields = async () => {
       <v-form @submit.prevent="saveEmailChange">
         <div class="editable-item ga-6">
           <label for="current-email">Текущий e-mail:</label>
-          <p >{{ currentUser.email }}</p>
+          <p>{{ currentUser.email }}</p>
         </div>
         <div class="editable-item ga-9">
           <label for="new-email">Новый e-mail:</label>
@@ -281,14 +311,7 @@ const onEditFields = async () => {
             clearable
           ></v-text-field>
         </div>
-        <v-btn
-          class="btn text-none mt-5"
-          width="200"
-          height="45"
-          color="blue"
-          flat
-          type="submit"
-        >
+        <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
           Сохранить изменения
         </v-btn>
       </v-form>
@@ -341,24 +364,13 @@ const onEditFields = async () => {
             clearable
           ></v-text-field>
         </div>
-        <v-btn
-          class="btn text-none mt-5"
-          width="200"
-          height="45"
-          color="blue"
-          flat
-          type="submit"
-        >
+        <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
           Сохранить изменения
         </v-btn>
       </v-form>
     </div>
     <div class="nav-links mt-7 d-flex flex-column">
-      <div
-        :class="['d-inline', { 'mt-2': link.addClass }]"
-        v-for="link in navLinks"
-        :key="link.id"
-      >
+      <div :class="['d-inline', { 'mt-2': link.addClass }]" v-for="link in navLinks" :key="link.id">
         <router-link
           class="nav-link"
           active-class="nav-link-active"

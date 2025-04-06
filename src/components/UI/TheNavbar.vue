@@ -57,7 +57,6 @@ onMounted(() => {
 watch(currentUser, (newValue: object) => {
   if (Object.keys(newValue)?.length) unRegisteredUser.value = false;
   else {
-    console.log(newValue);
     unRegisteredUser.value = true;
   }
 }, {immediate: true, deep: true});

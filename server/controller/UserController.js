@@ -135,5 +135,19 @@ router.put('/', (req, res) => {
     });
   }
 })
+
+router.delete('/', (req, res) => {
+  try {
+    airtable.delete(req.body.customId)
+    return res.status(200).json({
+      message: 'Аккаунт был удален',
+    });
+  } catch (error) {
+    console.error('Ошибка при запросе к Airtable:', error);
+    return res.status(500).json({
+      message: 'Ошибка сервера'
+    });
+  }
+})
   
 export default router
