@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref } from 'vue'
 import RegForm from './RegForm.vue'
 import { useUserStore } from '@/stores/UserStore.js'
 import type { INavMenu } from '@/interfaces'
 import { useRouter } from 'vue-router'
+import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 
+const { unRegisteredUser } = useCheckRegisteredUser()
 const userStore = useUserStore()
 const router = useRouter()
 
-const listOfCourses = ref<INavMenu[]>([
-  { id: 1, title: 'Python' },
-  { id: 2, title: 'JavaScript' },
-  { id: 3, title: 'C#' },
+const listOfLanguages = ref<INavMenu[]>([
+  { id: 1, title: 'Python', action: () => router.push({ name: 'Courses', params: { lang: 'python' } }) },
+  { id: 2, title: 'JavaScript', action: () => router.push({ name: 'Courses', params: { lang: 'js' } }) },
+  { id: 3, title: 'C#', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } })  },
 ])
 
 const profileItems = ref<INavMenu[]>([
@@ -32,34 +34,10 @@ const profileItems = ref<INavMenu[]>([
   },
 ])
 
-const unRegisteredUser = ref(true);
 const autorizationVisible = ref(false)
 const currentUser = computed(() => userStore.currentUser)
 const addAnimation = ref(false)
 const profileMenu = ref(false)
-
-onMounted(() => {
-  const localStorageUser = localStorage.getItem("currentUser");
-  const sessionStorageUser = sessionStorage.getItem("currentUser")
-  if (!localStorageUser && !sessionStorageUser) {
-    unRegisteredUser.value = true;
-  }
-  if (localStorageUser) {
-    unRegisteredUser.value = false;
-    userStore.INIT_CURRENT_USER(parseInt(JSON.parse(localStorageUser)));
-  }
-  if (sessionStorageUser) {
-    unRegisteredUser.value = false;
-    userStore.INIT_CURRENT_USER(parseInt(JSON.parse(sessionStorageUser)));
-  }
-})
-
-watch(currentUser, (newValue: object) => {
-  if (Object.keys(newValue)?.length) unRegisteredUser.value = false;
-  else {
-    unRegisteredUser.value = true;
-  }
-}, {immediate: true, deep: true});
 </script>
 
 <template>
@@ -72,12 +50,7 @@ watch(currentUser, (newValue: object) => {
       </template>
       EasyCode</v-btn
     >
-    <v-menu
-      v-if="!unRegisteredUser"
-      open-on-hover
-      open-delay="0"
-      close-delay="100"
-    >
+    <v-menu v-if="!unRegisteredUser" open-on-hover open-delay="0" close-delay="100">
       <template #activator="{ props }">
         <v-btn
           class="btn text-none px-0"
@@ -90,7 +63,11 @@ watch(currentUser, (newValue: object) => {
           @mouseleave="addAnimation = false"
         >
           <template #append>
-            <v-icon :class="{'add-animation': addAnimation}" size="22" icon="mdi-chevron-down"  ></v-icon>
+            <v-icon
+              :class="{ 'add-animation': addAnimation }"
+              size="22"
+              icon="mdi-chevron-down"
+            ></v-icon>
           </template>
           Курсы</v-btn
         >
@@ -98,13 +75,14 @@ watch(currentUser, (newValue: object) => {
       <v-card width="150" elevation="5" tile>
         <v-list class="pa-0" color="blue">
           <v-list-item
-            v-for="course in listOfCourses"
-            :key="course.id"
-            :value="course.id"
+            v-for="language in listOfLanguages"
+            :key="language.id"
+            :value="language.id"
             min-height="32"
             rounded="0"
+            @click="language.action"
           >
-            <v-list-item-title> {{ course.title }} </v-list-item-title>
+            <v-list-item-title> {{ language.title }} </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-card>
@@ -145,7 +123,11 @@ watch(currentUser, (newValue: object) => {
           v-bind="props"
         >
           <template #append>
-            <v-icon :class="{'add-animation': profileMenu}" size="22" icon="mdi-chevron-down"></v-icon>
+            <v-icon
+              :class="{ 'add-animation': profileMenu }"
+              size="22"
+              icon="mdi-chevron-down"
+            ></v-icon>
           </template>
           {{ currentUser.fullShortName }}</v-btn
         >

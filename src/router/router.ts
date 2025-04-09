@@ -22,9 +22,22 @@ const routes: RouteRecordRaw[] = [
     path: '/settings',
     redirect: { name: 'Settings', params: { userData: 'personal' } },
   },
+  {
+    path: '/courses/:lang',
+    name: 'Courses',
+    component: () => import('@/views/CoursesTitle.vue'),
+    beforeEnter: checkAuth,
+  }
 ];
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
   routes,
 });

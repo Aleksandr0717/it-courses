@@ -270,7 +270,8 @@ const onEditFields = () => {
         <v-card>
           <v-card-title class="ml-2 d-flex align-center justify-space-between">
             Подтверждение
-              <v-btn variant="text" icon="mdi-close" size="30" @click="confirmDialog = false"></v-btn>
+            <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false"
+              ><v-icon>mdi-close</v-icon></v-btn>
           </v-card-title>
           <v-card-text>
             Удаление аккаунта приведет к потере прогресса в курсах. Вы точно хотите удалить аккаунт?
@@ -330,7 +331,7 @@ const onEditFields = () => {
             :error-messages="passwordErrors.currentPassword"
             variant="outlined"
             hide-details="auto"
-            max-width="520"
+            max-width="510"
             density="comfortable"
             type="password"
             clearable
@@ -344,7 +345,7 @@ const onEditFields = () => {
             :error-messages="passwordErrors.password"
             variant="outlined"
             hide-details="auto"
-            max-width="520"
+            max-width="510"
             density="comfortable"
             type="password"
             clearable
@@ -358,7 +359,7 @@ const onEditFields = () => {
             :error-messages="passwordErrors.repeatedPassword"
             variant="outlined"
             hide-details="auto"
-            max-width="520"
+            max-width="510"
             density="comfortable"
             type="password"
             clearable

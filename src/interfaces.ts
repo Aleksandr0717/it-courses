@@ -18,3 +18,11 @@ export interface IContent extends INavMenu {
   description: string
   img: string
 }
+
+export interface ICourseInfo extends IContent {
+  authors: string
+  price: string
+  priceColor: string
+  level: string
+  levelColor: string
+}

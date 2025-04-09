@@ -4,9 +4,9 @@ import { ref } from 'vue';
 
 const listOfLinks = ref<INavLink[]>([
   { id: 1, title: 'Главная', to: { name: 'Home' } },
-  { id: 2, title: 'Курсы по Python', to: {} },
-  { id: 3, title: 'Курсы по JavaScript', to: {} },
-  { id: 4, title: 'Курсы по C#', to: {}  },
+  { id: 2, title: 'Курсы по Python', to: { name: 'Courses', params: { lang: 'python' }} },
+  { id: 3, title: 'Курсы по JavaScript', to: { name: 'Courses', params: { lang: 'js' }} },
+  { id: 4, title: 'Курсы по C#', to: { name: 'Courses', params: { lang: 'csharp' }} },
 ])
 </script>
 
