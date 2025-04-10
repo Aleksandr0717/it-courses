@@ -6,6 +6,7 @@ import { regExpForEmail } from '@/use/ValidationForms'
 import { useUserStore } from '@/stores/UserStore.js'
 import { useRouter } from 'vue-router'
 
+document.title = 'Настройки профиля'
 const router = useRouter()
 const userStore = useUserStore()
 const currentUser = computed({

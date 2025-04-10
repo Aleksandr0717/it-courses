@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import userService from '../plugins/api/services/UsersService'
+import userService from '../plugins/api/services/UsersService.js'
 
 export const useUserStore = defineStore('userStore', () => {
   const currentUser = ref({})
@@ -15,7 +15,7 @@ export const useUserStore = defineStore('userStore', () => {
       .then((response) => {
         if (response.name && response.lastName && response.secondName) {
           response.fullShortName =
-            response.lastName + ' ' + response.name[0] + '.' + response.secondName[0] + '.'
+            response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.' + response.secondName[0].toUpperCase() + '.'
         } else response.fullShortName = response.login
         SET_CURRENT_USER(response)
       })

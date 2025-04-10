@@ -4,6 +4,7 @@ import type { IContent } from '@/interfaces'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 import { useRouter } from 'vue-router'
 
+document.title = 'Главная'
 const router = useRouter()
 const { unRegisteredUser } = useCheckRegisteredUser()
 const contentList = ref<IContent[]>([

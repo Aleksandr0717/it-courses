@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ICourseInfo } from '@/interfaces'
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
+import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 
+document.title = 'Список курсов'
 const listOfPythonCourses = ref<ICourseInfo[]>([
   {
     id: 1,
@@ -269,25 +271,33 @@ const isFreeCourses = ref(false)
 const filterByDifficultyLevel = (list: Ref): ICourseInfo[] => {
   if (selectedDifficultyLevel.value.includes('Все уровни')) {
     return list.value
-  }
-  else {
-    return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level))
+  } else {
+    return list.value.filter((course: ICourseInfo) =>
+      selectedDifficultyLevel.value.includes(course.level),
+    )
   }
 }
 const filteredByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
   if (isFreeCourses.value) {
     return list.value.filter((course: ICourseInfo) => course.price === 'Бесплатно')
-  }
-  else return list.value
+  } else return list.value
 }
 
-const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses))
+const filteredByDifficultPythonCoursesList = computed(() =>
+  filterByDifficultyLevel(listOfPythonCourses),
+)
 const filteredByDifficultJSCoursesList = computed(() => filterByDifficultyLevel(listOfJSCourses))
-const filteredByDifficultCsharpCoursesList = computed(() => filterByDifficultyLevel(listOfCsharpCourses))
+const filteredByDifficultCsharpCoursesList = computed(() =>
+  filterByDifficultyLevel(listOfCsharpCourses),
+)
 
-const filteredByFreePythonCoursesList = computed(() => filteredByFree(filteredByDifficultPythonCoursesList))
+const filteredByFreePythonCoursesList = computed(() =>
+  filteredByFree(filteredByDifficultPythonCoursesList),
+)
 const filteredByFreeJSCoursesList = computed(() => filteredByFree(filteredByDifficultJSCoursesList))
-const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredByDifficultCsharpCoursesList))
+const filteredByFreeCsharpCoursesList = computed(() =>
+  filteredByFree(filteredByDifficultCsharpCoursesList),
+)
 </script>
 
 <template>
@@ -347,14 +357,11 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
         <div class="price ml-4 mt-3">
           <p>Цена</p>
           <div class="ml-6">
-            <v-checkbox
-              v-model="isFreeCourses"
-              hide-details
-              color="green"
-              density="compact"
+            <v-checkbox v-model="isFreeCourses" hide-details color="green" density="compact"
               ><template #label>
                 <p>Только бесплатные</p>
-              </template></v-checkbox>
+              </template></v-checkbox
+            >
           </div>
         </div>
         <v-divider></v-divider>
@@ -377,25 +384,12 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
         <div class="d-flex justify-center" v-else-if="!filteredByFreePythonCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <div v-else class="card" v-for="course in filteredByFreePythonCoursesList" :key="course.id">
-          <div class="desc-card d-flex ga-6 mb-3">
-            <img :src="course.img" alt="Логотип" height="110" />
-            <div class="desc-card-text d-flex flex-column ga-2">
-              <div class="d-flex flex-column">
-                <h4 style="line-height: 1">{{ course.title }}</h4>
-                <p>{{ course.authors }}</p>
-              </div>
-              <p>{{ course.description }}</p>
-              <div class="d-flex ga-3">
-                <v-chip :color="course.priceColor" size="small">{{ course.price }}</v-chip>
-                <v-chip :color="course.levelColor" variant="flat" size="small">{{
-                  course.level
-                }}</v-chip>
-              </div>
-            </div>
-          </div>
-          <v-divider class="mb-3"></v-divider>
-        </div>
+        <CourseTitleCard
+          v-else
+          v-for="course in filteredByFreePythonCoursesList"
+          :key="course.id"
+          :course="course"
+        />
       </div>
     </div>
     <div v-else-if="$route.params.lang === 'js'" class="main-content mt-4">
@@ -414,25 +408,12 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
         <div class="d-flex justify-center" v-else-if="!filteredByFreeJSCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <div v-else class="card" v-for="course in filteredByFreeJSCoursesList" :key="course.id">
-          <div class="desc-card d-flex ga-6 mb-3">
-            <img :src="course.img" alt="Логотип" height="110" />
-            <div class="desc-card-text d-flex flex-column ga-2">
-              <div class="d-flex flex-column">
-                <h4 style="line-height: 1">{{ course.title }}</h4>
-                <p>{{ course.authors }}</p>
-              </div>
-              <p>{{ course.description }}</p>
-              <div class="d-flex ga-3">
-                <v-chip :color="course.priceColor" size="small">{{ course.price }}</v-chip>
-                <v-chip :color="course.levelColor" variant="flat" size="small">{{
-                  course.level
-                }}</v-chip>
-              </div>
-            </div>
-          </div>
-          <v-divider class="mb-3"></v-divider>
-        </div>
+        <CourseTitleCard
+          v-else
+          v-for="course in filteredByFreeJSCoursesList"
+          :key="course.id"
+          :course="course"
+        />
       </div>
     </div>
     <div v-else class="main-content mt-4">
@@ -451,25 +432,12 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
         <div class="d-flex justify-center" v-else-if="!filteredByFreeCsharpCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <div v-else class="card" v-for="course in filteredByFreeCsharpCoursesList" :key="course.id">
-          <div class="desc-card d-flex ga-6 mb-3">
-            <img :src="course.img" alt="Логотип" height="110" />
-            <div class="desc-card-text d-flex flex-column ga-2">
-              <div class="d-flex flex-column">
-                <h4 style="line-height: 1">{{ course.title }}</h4>
-                <p>{{ course.authors }}</p>
-              </div>
-              <p>{{ course.description }}</p>
-              <div class="d-flex ga-3">
-                <v-chip :color="course.priceColor" size="small">{{ course.price }}</v-chip>
-                <v-chip :color="course.levelColor" variant="flat" size="small">{{
-                  course.level
-                }}</v-chip>
-              </div>
-            </div>
-          </div>
-          <v-divider class="mb-3"></v-divider>
-        </div>
+        <CourseTitleCard
+          v-else
+          v-for="course in filteredByFreeCsharpCoursesList"
+          :key="course.id"
+          :course="course"
+        />
       </div>
     </div>
   </div>
@@ -489,20 +457,11 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
       }
     }
   }
-  .main-content {
+  &-content {
     width: 70%;
-    padding-left: 60px;
-    padding-right: 350px;
-    .card {
-      cursor: pointer;
-      .desc-card-text {
-        p {
-          font-size: 14px;
-        }
-        h4:hover {
-          text-decoration: underline;
-        }
-      }
+    padding: {
+      left: 60px;
+      right: 350px;
     }
   }
 }

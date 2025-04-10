@@ -17,7 +17,7 @@ const airtable = new Airtable({ apiKey: auth_key }).base(base_name).table('users
 
 /*
     description: Маршрут для получения списка всех пользователей
-    router: http://localhost:3010/api/users/
+    router: http://localhost:3000/api/users/
     type: get
 */
 router.get('/', (req, res) => {
@@ -43,7 +43,7 @@ router.get('/', (req, res) => {
 
 /*
     description: Маршрут для поиска пользователя по логину и паролю
-    router: http://localhost:3010/api/users/login?login={login}&password={password}
+    router: http://localhost:3000/api/users/login?login={login}&password={password}
     type: get
 */
 router.get('/login', (req, res) => {
@@ -81,7 +81,7 @@ router.get('/login', (req, res) => {
 
 /*
     description: Маршрут для получения информации о пользователе по его ID
-    router: http://localhost:3010/api/users/{userId}
+    router: http://localhost:3000/api/users/{userId}
     type: get
 */
 router.get('/:userId', (req, res) => {

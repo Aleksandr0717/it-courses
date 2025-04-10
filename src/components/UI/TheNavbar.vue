@@ -42,7 +42,7 @@ const profileMenu = ref(false)
 
 <template>
   <v-app-bar height="50" class="navbar" flat>
-    <v-btn class="btn-main text-none px-0 ml-0" width="150" height="50" tile :to="{ name: 'Home' }">
+    <v-btn class="btn-main text-none px-0 ml-0" width="150" height="50" tile @click="$router.push({ name: 'Home' })">
       <template #prepend>
         <div class="img-bg">
           <img src="https://static.thenounproject.com/png/6135611-84.png" alt="Лого" height="30" />

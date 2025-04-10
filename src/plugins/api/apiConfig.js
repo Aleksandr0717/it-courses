@@ -15,8 +15,9 @@ export async function fetchData(url, options = {}) {
         message: `Ошибка: ${response.status} ${response.statusText}`,
       });
     }
-
-    return await response.json();
+    const data = await response.json();
+    
+    return data;
   } catch (error) {
     console.error("Ошибка при выполнении запроса:", error);
     throw error;
