@@ -34,7 +34,6 @@ const contentList = ref<IContent[]>([
   },
 ])
 
-// const isRegisteredUser = computed(() => localStorage.getItem("currentUser") || sessionStorage.getItem("currentUser"))
 </script>
 
 <template>

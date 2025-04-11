@@ -1,5 +1,5 @@
 import { computed, onMounted, ref, watch } from "vue";
-import { useUserStore } from "@/stores/userStore.js";
+import { useUserStore } from "@/stores/UserStore.js";
 
 export function useCheckRegisteredUser() {
   const userStore = useUserStore();
