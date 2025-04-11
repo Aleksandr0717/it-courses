@@ -16,7 +16,11 @@ export const useUserStore = defineStore('userStore', () => {
         if (response.name && response.lastName && response.secondName) {
           response.fullShortName =
             response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.' + response.secondName[0].toUpperCase() + '.'
-        } else response.fullShortName = response.login
+        } else if (response.name && response.lastName) {
+          response.fullShortName =
+            response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.'
+        }  
+        else response.fullShortName = '@' + response.login
         SET_CURRENT_USER(response)
       })
       .catch((error) => {
@@ -24,9 +28,9 @@ export const useUserStore = defineStore('userStore', () => {
       })
   }
 
-  const INIT_AUTORIZATION = async (usersInfo, rememberUser) => {
+  const INIT_AUTORIZATION = async (userInfo, rememberUser) => {
     await userService
-      .authorizationUser(usersInfo.login, usersInfo.password)
+      .authorizationUser(userInfo.loginUsername, userInfo.loginPassword)
       .then((response) => {
         alert(response.message)
         if (rememberUser) {
@@ -49,9 +53,9 @@ export const useUserStore = defineStore('userStore', () => {
           Name: '',
           LastName: '',
           SecondName: '',
-          Login: userData.login,
-          Password: userData.password,
-          Email: userData.email,
+          Login: userData.regUsername,
+          Password: userData.regPassword,
+          Email: userData.regEmail,
           City: '',
           Education: '',
           AboutMe: '',
@@ -74,7 +78,6 @@ export const useUserStore = defineStore('userStore', () => {
           Name: userData.name || '',
           LastName: userData.lastName || '',
           SecondName: userData.secondName || '',
-          Login: userData.login,
           Password: userData.password,
           Email: userData.email,
           City: userData.city || '',
@@ -93,7 +96,13 @@ export const useUserStore = defineStore('userStore', () => {
 
   const INIT_DELETE_USER = async (userData) => {
     try {
-      const response = await userService.deleteUser(userData);
+      const userPayload = {
+        id: userData.customId,
+        fields: {
+          Status: 'Deleted'
+        }
+      }
+      const response = await userService.updateUserData(userPayload);
       alert(response.message);
       return response;
     } catch (error) {
@@ -103,8 +112,8 @@ export const useUserStore = defineStore('userStore', () => {
   };
 
   const INIT_LOGOUT = () => {
-    localStorage.removeItem('currentUser')
-    sessionStorage.removeItem('currentUser')
+    if (localStorage.getItem('currentUser')) localStorage.removeItem('currentUser') 
+    else sessionStorage.removeItem('currentUser')
     SET_CURRENT_USER({})
   }
 

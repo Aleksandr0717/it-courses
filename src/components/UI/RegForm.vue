@@ -64,8 +64,8 @@ const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
 const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
 
 
-const onRegSubmit = regHandleSubmit( async () => {
-  await userStore.INIT_CREATE_NEW_USER({login: regUsername.value, password: regPassword.value, email: regEmail.value})
+const onRegSubmit = regHandleSubmit( async (values) => {
+  await userStore.INIT_CREATE_NEW_USER(values)
   .finally(() => {
     tab.value = 2
     resetRegForm()
@@ -74,9 +74,9 @@ const onRegSubmit = regHandleSubmit( async () => {
   })
 })
 
-const onLoginSubmit = loginHandleSubmit(async () => {
+const onLoginSubmit = loginHandleSubmit(async (values) => {
   loading.value = true
-  await userStore.INIT_AUTORIZATION({login: loginUsername.value, password: loginPassword.value}, checkRememberMe.value)
+  await userStore.INIT_AUTORIZATION(values, checkRememberMe.value)
     .finally(() => {
       localVisibleForm.value = false
       resetRegForm()
@@ -138,6 +138,7 @@ const loading = ref(false)
           <v-form
             class="mt-4 d-flex justify-center ga-4 flex-column"
             @submit.prevent="onRegSubmit"
+            fast-fail
           >
             <v-text-field
               class="search align-center py-0 ml-3"
@@ -206,6 +207,7 @@ const loading = ref(false)
           <v-form
             class="form-control mt-4 d-flex justify-center ga-4 flex-column"
             @submit.prevent="onLoginSubmit"
+            fast-fail
           >
             <v-text-field
               class="search align-center py-0 ml-3"
@@ -267,7 +269,7 @@ const loading = ref(false)
 
 <style scoped lang="scss">
 .form-login {
-  align-self: anchor-center;
+  align-self: center;
   .form-btn {
     letter-spacing: 0;
     font-size: 16px;

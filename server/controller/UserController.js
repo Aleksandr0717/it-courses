@@ -64,6 +64,9 @@ router.get('/login', (req, res) => {
     })
     .then((resp) => {
       if (resp.error) return res.status(404).json({ message: 'Произошла ошибка сервера' })
+      if (reFormaterResponseData(resp.records)[0].status === 'Deleted') {
+        return res.status(404).json({ message: 'Неверный логин или пароль' })
+      } 
       if (resp.records.length > 0) {
         // Пользователь найден
         const user = reFormaterResponseData(resp.records)[0]
@@ -106,11 +109,13 @@ router.get('/:userId', (req, res) => {
 
 router.post('/', (req, res) => {
   try {
-    airtable.create({...req.body});
-
-    return res.status(200).json({
-      message: 'Пользователь успешно зарегистрирован',
-    });
+    airtable.create({...req.body})
+    .then((resp) => {
+      if (resp.error) return res.status(404).json({ message: 'Произошла ошибка сервера' })
+      return res.status(200).json({
+        message: 'Пользователь успешно зарегистрирован',
+      });
+    })
   } catch (error) {
     console.error('Ошибка при запросе к Airtable:', error);
     return res.status(500).json({ 
@@ -123,25 +128,19 @@ router.put('/', (req, res) => {
   try {
     const uid = req.body.id;
     delete req.body.id;
-    airtable.update(uid, {...req.body});
-
-    return res.status(200).json({
-      message: 'Данные успешно обновлены',
-    });
-  } catch (error) {
-    console.error('Ошибка при запросе к Airtable:', error);
-    return res.status(500).json({
-      message: 'Ошибка сервера'
-    });
-  }
-})
-
-router.delete('/', (req, res) => {
-  try {
-    airtable.delete(req.body.customId)
-    return res.status(200).json({
-      message: 'Аккаунт был удален',
-    });
+    airtable.update(uid, {...req.body})
+    .then((resp) => {
+      if (resp.error) return res.status(404).json({ message: 'Произошла ошибка сервера' })
+      if (Object.keys(req.body.fields).length > 1) {
+        return res.status(200).json({
+          message: 'Данные успешно обновлены',
+        });
+      } else {
+        return res.status(200).json({
+          message: 'Аккаунт был удален',
+        });
+      }
+    })
   } catch (error) {
     console.error('Ошибка при запросе к Airtable:', error);
     return res.status(500).json({

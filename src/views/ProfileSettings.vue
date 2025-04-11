@@ -87,6 +87,7 @@ const {
     password(value: string): string | boolean {
       if (!value?.length && currentPassword.value) return 'Введите новый пароль'
       else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов'
+      else if (value === currentUser.value.password) return 'Новый пароль совпадает с текущим'
       return true
     },
     repeatedPassword(value: string): string | boolean {
@@ -104,7 +105,6 @@ const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedP
 const savePersonalDataChange = async (): Promise<void> => {
   await userStore.INIT_UPDATE_USER(currentUser.value)
   isDisabledPersonalData.value = true
-  console.log(currentUser.value)
 }
 
 const saveEmailChange = emailHandleSubmit(async () => {
@@ -129,8 +129,11 @@ const deleteAccount = async (): Promise<void> => {
   router.push({ name: 'Home' })
 }
 
-const onEditFields = () => {
-  isDisabledPersonalData.value = false
+const returnBack = () => {
+  router.back()
+  emailResetForm()
+  passwordResetForm()
+  isDisabledPersonalData.value = true
 }
 </script>
 
@@ -143,7 +146,7 @@ const onEditFields = () => {
         width="40"
         height="30"
         icon="mdi-arrow-left"
-        @click="$router.back()"
+        @click="returnBack"
       />
     </div>
     <div v-if="$route.params.userData === 'personal'" class="editable-items mt-7">
@@ -152,11 +155,11 @@ const onEditFields = () => {
         <VDivider opacity=".3" />
       </div>
       <div class="editable-item">
-        <label style="margin-right: 103px" for="name">Имя:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
+        <label style="margin-right: 58px;" for="fam">Фамилия*:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
         <v-text-field
           v-else
-          v-model="currentUser.name"
+          v-model="currentUser.lastName"
           variant="outlined"
           hide-details
           max-width="545"
@@ -165,11 +168,11 @@ const onEditFields = () => {
         ></v-text-field>
       </div>
       <div class="editable-item">
-        <label style="margin-right: 65px" for="fam">Фамилия:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
+        <label style="margin-right: 96px" for="name">Имя*:</label>
+        <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
         <v-text-field
           v-else
-          v-model="currentUser.lastName"
+          v-model="currentUser.name"
           variant="outlined"
           hide-details
           max-width="545"
@@ -234,6 +237,7 @@ const onEditFields = () => {
           clearable
         ></v-textarea>
       </div>
+      <p style="padding-left: 50px; margin-top: 20px; font-size: 13px;">* - Рекомендуемые для заполнения поля</p>
       <v-btn
         v-if="isDisabledPersonalData"
         class="btn text-none mt-5"
@@ -241,7 +245,7 @@ const onEditFields = () => {
         height="45"
         color="green"
         flat
-        @click="onEditFields"
+        @click="isDisabledPersonalData = false"
       >
         Редактировать информацию
       </v-btn>

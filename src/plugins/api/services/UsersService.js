@@ -36,16 +36,6 @@ class UserService {
       body: JSON.stringify(userData),
     });
   }
-
-  async deleteUser(userData) {
-    return fetchData(`${API_BASE_URL}/users`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-  }
 }
 
 // Класс для работы с API пользователей

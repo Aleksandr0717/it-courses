@@ -283,21 +283,13 @@ const filteredByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
   } else return list.value
 }
 
-const filteredByDifficultPythonCoursesList = computed(() =>
-  filterByDifficultyLevel(listOfPythonCourses),
-)
+const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses))
 const filteredByDifficultJSCoursesList = computed(() => filterByDifficultyLevel(listOfJSCourses))
-const filteredByDifficultCsharpCoursesList = computed(() =>
-  filterByDifficultyLevel(listOfCsharpCourses),
-)
+const filteredByDifficultCsharpCoursesList = computed(() =>filterByDifficultyLevel(listOfCsharpCourses))
 
-const filteredByFreePythonCoursesList = computed(() =>
-  filteredByFree(filteredByDifficultPythonCoursesList),
-)
+const filteredByFreePythonCoursesList = computed(() => filteredByFree(filteredByDifficultPythonCoursesList))
 const filteredByFreeJSCoursesList = computed(() => filteredByFree(filteredByDifficultJSCoursesList))
-const filteredByFreeCsharpCoursesList = computed(() =>
-  filteredByFree(filteredByDifficultCsharpCoursesList),
-)
+const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredByDifficultCsharpCoursesList))
 </script>
 
 <template>
