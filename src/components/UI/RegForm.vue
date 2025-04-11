@@ -110,7 +110,7 @@ const loading = ref(false)
 <template>
   <v-dialog
     v-model="localVisibleForm"
-    opacity="0.7"
+    opacity=".7"
     transition="dialog-bottom-transition"
     persistent
   >
@@ -267,18 +267,14 @@ const loading = ref(false)
 
 <style scoped lang="scss">
 .form-login {
-  left: 750px;
+  align-self: anchor-center;
   .form-btn {
     letter-spacing: 0;
     font-size: 16px;
   }
 }
-.form-register {
-  top: 270px;
-  left: 750px;
   .form-btn {
     letter-spacing: 0;
     font-size: 16px;
   }
-}
 </style>
