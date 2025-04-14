@@ -14,15 +14,17 @@ export interface INavLink extends INavMenu {
   addClass?: boolean,
 }
 
-export interface IContent extends INavMenu {
+export interface ICourseType extends INavMenu {
   description: string
   img: string
+  to?: string
 }
 
-export interface ICourseInfo extends IContent {
+export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
   priceColor: string
   level: string
   levelColor: string
+  courseTypeTitle: string[]
 }

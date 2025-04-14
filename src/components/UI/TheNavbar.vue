@@ -112,15 +112,16 @@ const profileMenu = ref(false)
         <v-icon size="22" icon="mdi-account-circle"></v-icon>
       </template>
       Авторизация</v-btn
-    >
-    <v-menu v-if="!unRegisteredUser" v-model="profileMenu">
-      <template #activator="{ props }">
+      >
+      <v-menu v-if="!unRegisteredUser" v-model="profileMenu">
+        <template #activator="{ props }">
         <v-btn
           class="btn text-none px-0 mr-5"
           width="150"
           height="30"
           variant="outlined"
           v-bind="props"
+          :loading="userStore.isLoading"
         >
           <template #append>
             <v-icon

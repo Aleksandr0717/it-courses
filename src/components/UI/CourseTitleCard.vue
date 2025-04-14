@@ -17,8 +17,14 @@ const props = defineProps<{
         </div>
         <p>{{ course.description }}</p>
         <div class="d-flex ga-3">
-          <v-chip :color="course.priceColor" size="small">{{ course.price }}</v-chip>
-          <v-chip :color="course.levelColor" variant="flat" size="small">{{ course.level }}</v-chip>
+          <v-chip :color="course.price === 'Бесплатно' ? 'green' : 'red'" size="small">{{
+            course.price
+          }}</v-chip>
+          <v-chip :color="course.level === 'Начальный уровень' ? 'blue' : course.level === 'Средний уровень' ? 'yellow' : 'orange'"
+            variant="flat"
+            size="small"
+            >{{ course.level }}</v-chip
+          >
         </div>
       </div>
     </div>

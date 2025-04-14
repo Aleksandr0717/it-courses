@@ -9,6 +9,7 @@ import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { registerServices } from '@/plugins/api/index.js'
 
 const vuetify = createVuetify({
   icons: {
@@ -23,6 +24,7 @@ const vuetify = createVuetify({
  });
  
 const app = createApp(App)
+registerServices(app);
 
 app.use(createPinia())
 app.use(router)

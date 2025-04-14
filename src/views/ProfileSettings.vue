@@ -44,7 +44,8 @@ const navLinks = ref<INavLink[]>([
     to: { name: 'Settings', params: { userData: 'email' } },
     addClass: true,
     action: () => {
-      passwordResetForm(), (isDisabledPersonalData.value = true)
+      passwordResetForm()
+      isDisabledPersonalData.value = true
     },
   },
   {
@@ -53,7 +54,8 @@ const navLinks = ref<INavLink[]>([
     to: { name: 'Settings', params: { userData: 'password' } },
     addClass: true,
     action: () => {
-      emailResetForm(), (isDisabledPersonalData.value = true)
+      emailResetForm()
+      isDisabledPersonalData.value = true
     },
   },
 ])
@@ -67,6 +69,7 @@ const {
   validationSchema: {
     newEmail(value: string): string | boolean {
       if (!regExpForEmail.test(value)) return 'Введите корректный e-mail'
+      else if (value === currentUser.value.email) return 'Новый e-mail совпадает с текущим'
       return true
     },
   },
@@ -140,143 +143,148 @@ const returnBack = () => {
 <template>
   <div class="main d-flex justify-center">
     <div class="back-btn">
-      <v-btn
-        variant="text"
-        tile
-        width="40"
-        height="30"
-        icon="mdi-arrow-left"
-        @click="returnBack"
-      />
+      <v-btn variant="text" tile width="40" height="30" icon="mdi-arrow-left" @click="returnBack" />
     </div>
     <div v-if="$route.params.userData === 'personal'" class="editable-items mt-7">
       <div class="header text-center d-flex flex-column">
         <h3>Личная информация</h3>
         <VDivider opacity=".3" />
       </div>
-      <div class="editable-item">
-        <label style="margin-right: 58px;" for="fam">Фамилия*:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
-        <v-text-field
-          v-else
-          v-model="currentUser.lastName"
-          variant="outlined"
-          hide-details
-          max-width="545"
-          density="comfortable"
-          clearable
-        ></v-text-field>
-      </div>
-      <div class="editable-item">
-        <label style="margin-right: 96px" for="name">Имя*:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
-        <v-text-field
-          v-else
-          v-model="currentUser.name"
-          variant="outlined"
-          hide-details
-          max-width="545"
-          density="comfortable"
-          clearable
-        ></v-text-field>
-      </div>
-      <div class="editable-item">
-        <label style="margin-right: 63px" for="fam">Отчество:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
-        <v-text-field
-          v-else
-          v-model="currentUser.secondName"
-          variant="outlined"
-          hide-details
-          max-width="545"
-          density="comfortable"
-          clearable
-        ></v-text-field>
-      </div>
-      <div class="editable-item">
-        <label style="margin-right: 90px" for="city">Город:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
-        <v-text-field
-          v-else
-          v-model="currentUser.city"
-          variant="outlined"
-          hide-details
-          max-width="545"
-          density="comfortable"
-          clearable
-        ></v-text-field>
-      </div>
-      <div class="editable-item">
-        <label style="margin-right: 34px" for="education">Образование:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
-        <v-autocomplete
-          v-else
-          v-model="currentUser.education"
-          max-width="330"
-          clearable
-          density="comfortable"
-          hide-details
-          placeholder="Выберите уровень образования"
-          :items="educationLevels"
-          variant="outlined"
-          open-on-clear
-        ></v-autocomplete>
-      </div>
-      <div class="editable-item align-start">
-        <label style="margin-right: 71px" for="about">Обо мне:</label>
-        <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
-        <v-textarea
-          v-else
-          v-model="currentUser.aboutMe"
-          variant="outlined"
-          hide-details="auto"
-          maxlength="255"
-          counter="255"
-          auto-grow
-          max-width="545"
-          clearable
-        ></v-textarea>
-      </div>
-      <p style="padding-left: 50px; margin-top: 20px; font-size: 13px;">* - Рекомендуемые для заполнения поля</p>
-      <v-btn
-        v-if="isDisabledPersonalData"
-        class="btn text-none mt-5"
-        width="250"
-        height="45"
+      <div class="d-flex justify-center align-center" style="height: 400px;" v-if="userStore.isLoading">
+      <v-progress-circular
+        :size="50"
         color="green"
-        flat
-        @click="isDisabledPersonalData = false"
-      >
-        Редактировать информацию
-      </v-btn>
-      <v-btn
-        v-else
-        class="btn text-none mt-5"
-        width="200"
-        height="45"
-        color="blue"
-        flat
-        @click="savePersonalDataChange"
-      >
-        Сохранить изменения
-      </v-btn>
-      <v-btn
-        v-if="isDisabledPersonalData"
-        class="btn text-none mt-5"
-        width="150"
-        height="45"
-        color="red"
-        flat
-        @click="confirmDialog = true"
-      >
-        Удалить аккаунт
-      </v-btn>
+        indeterminate
+      ></v-progress-circular>
+      </div>
+      <div v-else>
+        <div class="editable-item">
+          <label style="margin-right: 58px" for="fam">Фамилия*:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
+          <v-text-field
+            v-else
+            v-model="currentUser.lastName"
+            variant="outlined"
+            hide-details
+            max-width="545"
+            density="comfortable"
+            clearable
+          ></v-text-field>
+        </div>
+        <div class="editable-item">
+          <label style="margin-right: 96px" for="name">Имя*:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
+          <v-text-field
+            v-else
+            v-model="currentUser.name"
+            variant="outlined"
+            hide-details
+            max-width="545"
+            density="comfortable"
+            clearable
+          ></v-text-field>
+        </div>
+        <div class="editable-item">
+          <label style="margin-right: 63px" for="fam">Отчество:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
+          <v-text-field
+            v-else
+            v-model="currentUser.secondName"
+            variant="outlined"
+            hide-details
+            max-width="545"
+            density="comfortable"
+            clearable
+          ></v-text-field>
+        </div>
+        <div class="editable-item">
+          <label style="margin-right: 90px" for="city">Город:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
+          <v-text-field
+            v-else
+            v-model="currentUser.city"
+            variant="outlined"
+            hide-details
+            max-width="545"
+            density="comfortable"
+            clearable
+          ></v-text-field>
+        </div>
+        <div class="editable-item">
+          <label style="margin-right: 34px" for="education">Образование:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
+          <v-autocomplete
+            v-else
+            v-model="currentUser.education"
+            max-width="330"
+            clearable
+            density="comfortable"
+            hide-details
+            placeholder="Выберите уровень образования"
+            :items="educationLevels"
+            variant="outlined"
+            open-on-clear
+          ></v-autocomplete>
+        </div>
+        <div class="editable-item align-start">
+          <label style="margin-right: 71px" for="about">Обо мне:</label>
+          <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
+          <v-textarea
+            v-else
+            v-model="currentUser.aboutMe"
+            variant="outlined"
+            hide-details="auto"
+            maxlength="255"
+            counter="255"
+            auto-grow
+            max-width="545"
+            clearable
+          ></v-textarea>
+        </div>
+        <p style="padding-left: 50px; margin-top: 20px; font-size: 13px">
+          * - Рекомендуемые для заполнения поля
+        </p>
+        <v-btn
+          v-if="isDisabledPersonalData"
+          class="btn text-none mt-5"
+          width="250"
+          height="45"
+          color="green"
+          flat
+          @click="isDisabledPersonalData = false"
+        >
+          Редактировать информацию
+        </v-btn>
+        <v-btn
+          v-else
+          class="btn text-none mt-5"
+          width="200"
+          height="45"
+          color="blue"
+          flat
+          @click="savePersonalDataChange"
+        >
+          Сохранить изменения
+        </v-btn>
+        <v-btn
+          v-if="isDisabledPersonalData"
+          class="btn text-none mt-5"
+          width="150"
+          height="45"
+          color="red"
+          flat
+          @click="confirmDialog = true"
+        >
+          Удалить аккаунт
+        </v-btn>
+      </div>
       <v-dialog v-model="confirmDialog" max-width="500" persistent>
         <v-card>
           <v-card-title class="ml-2 d-flex align-center justify-space-between">
             Подтверждение
             <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false"
-              ><v-icon>mdi-close</v-icon></v-btn>
+              ><v-icon>mdi-close</v-icon></v-btn
+            >
           </v-card-title>
           <v-card-text>
             Удаление аккаунта приведет к потере прогресса в курсах. Вы точно хотите удалить аккаунт?
@@ -299,7 +307,14 @@ const returnBack = () => {
         <h3>Изменение почты</h3>
         <VDivider opacity=".3" />
       </div>
-      <v-form @submit.prevent="saveEmailChange">
+      <div class="loader d-flex justify-center align-center" style="height: 150px;" v-if="userStore.isLoading">
+        <v-progress-circular
+          :size="50"
+          color="blue"
+          indeterminate
+        ></v-progress-circular>
+      </div>
+      <v-form v-else @submit.prevent="saveEmailChange">
         <div class="editable-item ga-6">
           <label for="current-email">Текущий e-mail:</label>
           <p>{{ currentUser.email }}</p>

@@ -1,6 +1,7 @@
-import UsersService from "./services/UsersService.js";
+import UserService from "./services/UsersService.js";
+import CourseService from "./services/CourseService.js";
 
 export const registerServices = (app) => {
-    // Предоставляем UserService через provide
-    app.provide("usersService", UsersService);
+    app.provide("userService", UserService);
+    app.provide("courseService", CourseService);
 }

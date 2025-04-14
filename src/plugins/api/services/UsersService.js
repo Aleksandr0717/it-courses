@@ -1,11 +1,8 @@
-import {API_BASE_URL, fetchData} from "../apiConfig.js";
+import { API_BASE_URL, fetchData } from "../apiConfig.js";
 
 class UserService {
-  constructor() {
-  }
 
   async getAllUsers() {
-    console.log(`${API_BASE_URL}/users`);
     return fetchData(`${API_BASE_URL}/users`);
   }
 
@@ -38,7 +35,6 @@ class UserService {
   }
 }
 
-// Класс для работы с API пользователей
-const userService = new UserService(API_BASE_URL);
+const userService = new UserService();
 
 export default userService;

@@ -1,15 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import userService from '../plugins/api/services/UsersService.js'
+import { inject, ref } from 'vue'
 
 export const useUserStore = defineStore('userStore', () => {
+  const userService = inject('userService')
   const currentUser = ref({})
+  const isLoading = ref(false)
 
   const SET_CURRENT_USER = (payload) => {
     currentUser.value = payload
   }
 
   const INIT_CURRENT_USER = async (userId) => {
+    isLoading.value = true
     await userService
       .getUserById(userId)
       .then((response) => {
@@ -22,6 +24,7 @@ export const useUserStore = defineStore('userStore', () => {
         }  
         else response.fullShortName = '@' + response.login
         SET_CURRENT_USER(response)
+        isLoading.value = false
       })
       .catch((error) => {
         console.error(error)
@@ -119,6 +122,7 @@ export const useUserStore = defineStore('userStore', () => {
 
   return {
     currentUser,
+    isLoading,
     SET_CURRENT_USER,
     INIT_CREATE_NEW_USER,
     INIT_CURRENT_USER,

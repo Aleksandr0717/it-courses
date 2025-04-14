@@ -2,7 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 
 const checkAuth = (): boolean | object => {
-  if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) return { name: 'Home' };
+  if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) {
+    alert('Вы не прошли авторизацию')
+    return { name: 'Home' };
+  }
   return true;
 };
 
