@@ -1,3 +1,19 @@
+export interface IUserInfo {
+  id: number
+  customId: string
+  lastName: string
+  name: string
+  secondName: string
+  fullShortName: string
+  login: string
+  password: string
+  email: string
+  city: string
+  education: string
+  aboutMe: string
+  status: string
+}
+
 export interface INavMenu {
   id: number
   title: string
@@ -18,13 +34,14 @@ export interface ICourseType extends INavMenu {
   description: string
   img: string
   to?: string
+  courseTitleId: string[]
 }
 
 export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
-  priceColor: string
   level: string
-  levelColor: string
   courseTypeTitle: string[]
+  customId: string
+  courseType: string[]
 }

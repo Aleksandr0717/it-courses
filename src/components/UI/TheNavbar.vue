@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import RegForm from './RegForm.vue'
-import { useUserStore } from '@/stores/UserStore.js'
-import type { INavMenu } from '@/interfaces'
+import { useUserStore } from '@/stores/UserStore'
+import { type INavMenu } from '@/interfaces'
 import { useRouter } from 'vue-router'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 

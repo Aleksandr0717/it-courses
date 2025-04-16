@@ -16,7 +16,6 @@ export async function fetchData(url, options = {}) {
       });
     }
     const data = await response.json();
-    
     return data;
   } catch (error) {
     console.error("Ошибка при выполнении запроса:", error);

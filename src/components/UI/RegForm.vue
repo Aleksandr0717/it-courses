@@ -2,7 +2,7 @@
 import { useUserStore } from '@/stores/UserStore.js'
 import { ref } from 'vue'
 import type { ITabs } from '@/interfaces'
-import { useForm } from 'vee-validate'
+import { useForm, type GenericObject } from 'vee-validate'
 import { regExpForEmail, RegExpForLogin } from '@/use/ValidationForms'
 
 const {
@@ -64,7 +64,7 @@ const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
 const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
 
 
-const onRegSubmit = regHandleSubmit( async (values) => {
+const onRegSubmit = regHandleSubmit( async (values: GenericObject) => {
   await userStore.INIT_CREATE_NEW_USER(values)
   .finally(() => {
     tab.value = 2
@@ -74,7 +74,7 @@ const onRegSubmit = regHandleSubmit( async (values) => {
   })
 })
 
-const onLoginSubmit = loginHandleSubmit(async (values) => {
+const onLoginSubmit = loginHandleSubmit(async (values: GenericObject) => {
   loading.value = true
   await userStore.INIT_AUTORIZATION(values, checkRememberMe.value)
     .finally(() => {

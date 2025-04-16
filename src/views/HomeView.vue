@@ -15,12 +15,9 @@ onMounted( async () => {
   isLoading.value = true
   try {
     const response = await courseService.getCoursesType();
-    coursesTypesList.value = response.map((item: ICourseType) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      img: item.img,
-      action: () => router.push({ name: 'Courses', params: { lang: item.to } }),
+    coursesTypesList.value = response.map((courseTypeCard: ICourseType) => ({
+      ...courseTypeCard,
+      action: () => router.push({ name: 'Courses', params: { lang: courseTypeCard.to } }),
     }));
   } catch (error) {
     console.error('Ошибка при получении данных: ', error);

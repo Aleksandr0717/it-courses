@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import type { INavLink } from '@/interfaces'
 import { useForm } from 'vee-validate'
 import { regExpForEmail } from '@/use/ValidationForms'
-import { useUserStore } from '@/stores/UserStore.js'
+import { useUserStore } from '@/stores/UserStore'
 import { useRouter } from 'vue-router'
 
 document.title = 'Настройки профиля'

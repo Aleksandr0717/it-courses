@@ -2,21 +2,31 @@
 import type { ICourseInfo } from '@/interfaces'
 import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
+import { useRouter } from 'vue-router'
 
 document.title = 'Список курсов'
+const router = useRouter()
 const courseService: any = inject('courseService')
 const listOfPythonCourses = ref<ICourseInfo[]>([])
 const listOfJSCourses = ref<ICourseInfo[]>([])
 const listOfCsharpCourses = ref<ICourseInfo[]>([])
 const isLoading = ref(false)
 
+const reformaterResponse = (response: ICourseInfo[], courseType: string): ICourseInfo[] => {
+  return response.filter((courseTitleCard: ICourseInfo) => courseTitleCard.courseTypeTitle.includes(courseType))
+      .map((courseTitleCard: ICourseInfo) => ({
+        ...courseTitleCard,  
+        action: () => router.push({ name: 'Course', params: { id: courseTitleCard.customId } })
+      }))   
+}
+
 onMounted(async () => {
   isLoading.value = true
   try {
     const response = await courseService.getCourseTitle()
-    listOfPythonCourses.value = response.filter((course: ICourseInfo) => course.courseTypeTitle.includes('python'))
-    listOfJSCourses.value = response.filter((course: ICourseInfo) => course.courseTypeTitle.includes('js'))
-    listOfCsharpCourses.value = response.filter((course: ICourseInfo) => course.courseTypeTitle.includes('csharp'))
+    listOfPythonCourses.value = reformaterResponse(response, 'python')
+    listOfJSCourses.value = reformaterResponse(response, 'js')
+    listOfCsharpCourses.value = reformaterResponse(response, 'csharp')
   } catch (error) {
     console.log('Ошибка при получении данных: ', error)
   } finally {
@@ -147,6 +157,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           v-for="course in filteredByFreePythonCoursesList"
           :key="course.id"
           :course="course"
+          @click="course.action"
         />
       </div>
     </div>
@@ -178,6 +189,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           v-for="course in filteredByFreeJSCoursesList"
           :key="course.id"
           :course="course"
+          @click="course.action"
         />
       </div>
     </div>
@@ -209,6 +221,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           v-for="course in filteredByFreeCsharpCoursesList"
           :key="course.id"
           :course="course"
+          @click="course.action"
         />
       </div>
     </div>

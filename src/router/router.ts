@@ -30,7 +30,17 @@ const routes: RouteRecordRaw[] = [
     name: 'Courses',
     component: () => import('@/views/CoursesTitle.vue'),
     beforeEnter: checkAuth,
-  }
+  },
+  {
+    path: '/courses',
+    redirect: { name: 'Courses', params: { lang: 'python' } },
+  },
+  {
+    path: '/courses/:lang/:id',
+    name: 'Course',
+    component: () => import('@/views/CourseDescription.vue'),
+    beforeEnter: checkAuth,
+  },
 ];
 
 export const router = createRouter({
