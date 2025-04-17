@@ -130,8 +130,8 @@ const profileMenu = ref(false)
               icon="mdi-chevron-down"
             ></v-icon>
           </template>
-          {{ currentUser.fullShortName }}</v-btn
-        >
+          {{ currentUser?.fullShortName }}
+        </v-btn>
       </template>
       <v-card width="200" elevation="5" tile>
         <v-list class="pa-0" color="green" slim>

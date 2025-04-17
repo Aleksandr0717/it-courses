@@ -33,8 +33,11 @@ router.get('/title', (req, res) => {
     .table('coursesTitle')
     .list({
       sort: [{ field: 'Id' }],
+      filterByFormula: `SEARCH('python', ARRAYJOIN(CourseTypeTitle, ','))`
+      // filterByFormula: `{CourseType} = [${}]`
     })
     .then((resp) => {
+      console.log(resp)
       try {
         const records = reFormaterResponseData(resp.records)
         res.json(records)
