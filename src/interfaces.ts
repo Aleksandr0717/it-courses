@@ -40,8 +40,21 @@ export interface ICourseType extends INavMenu {
 export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
-  level: string
+  level: number
   courseTypeTitle: string[]
   customId: string
   courseType: string[]
+}
+
+export interface ICourseProgram {
+  id: number
+  customId: string
+  courseId: string[] | string
+  title: string[] | string
+  img: string[] | string
+  description: string[] | string
+  skills: string[]
+  includes: string[]
+  about: string
+  requirements: string
 }

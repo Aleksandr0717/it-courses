@@ -29,15 +29,37 @@ router.get('/', (req, res) => {
 })
 
 router.get('/title', (req, res) => {
+  const { courseType } = req.query
   airtable
     .table('coursesTitle')
     .list({
       sort: [{ field: 'Id' }],
-      filterByFormula: `SEARCH('python', ARRAYJOIN(CourseTypeTitle, ','))`
-      // filterByFormula: `{CourseType} = [${}]`
+      filterByFormula: `SEARCH('${courseType}', ARRAYJOIN(CourseTypeTitle, ','))`
     })
     .then((resp) => {
-      console.log(resp)
+      try {
+        const records = reFormaterResponseData(resp.records)
+        res.json(records)
+      } catch (err) {
+        console.error('Ошибка при обработке данных:', err)
+        res.status(500).json({ error: 'Ошибка при обработке данных' })
+      }
+    })
+    .catch((err) => {
+      console.error('Ошибка при получении данных из Airtable:', err)
+      res.status(500).json({ error: 'Ошибка при получении данных из Airtable' })
+    })
+})
+
+router.get('/title/program', (req, res) => {
+  const { courseId } = req.query
+  airtable
+    .table('coursesProgram')
+    .list({
+      filterByFormula: `SEARCH('${courseId}', ARRAYJOIN(CourseId, ','))`,
+      maxRecords: 1
+    })
+    .then((resp) => {
       try {
         const records = reFormaterResponseData(resp.records)
         res.json(records)

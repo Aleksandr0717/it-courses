@@ -1,44 +1,31 @@
 <script setup lang="ts">
 import type { ICourseInfo } from '@/interfaces'
-import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { useCoursesStore } from '@/stores/CoursesStore';
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
-import { useRouter } from 'vue-router'
+import PageLoader from '@/components/UI/PageLoader.vue';
 
 document.title = 'Список курсов'
-const router = useRouter()
-const courseService: any = inject('courseService')
+const coursesStore = useCoursesStore();
+
 const listOfPythonCourses = ref<ICourseInfo[]>([])
 const listOfJSCourses = ref<ICourseInfo[]>([])
 const listOfCsharpCourses = ref<ICourseInfo[]>([])
 const isLoading = ref(false)
 
-const reformaterResponse = (response: ICourseInfo[], courseType: string): ICourseInfo[] => {
-  return response.filter((courseTitleCard: ICourseInfo) => courseTitleCard.courseTypeTitle.includes(courseType))
-      .map((courseTitleCard: ICourseInfo) => ({
-        ...courseTitleCard,  
-        action: () => router.push({ name: 'Course', params: { id: courseTitleCard.customId } })
-      }))   
-}
-
 onMounted(async () => {
   isLoading.value = true
-  try {
-    const response = await courseService.getCourseTitle()
-    listOfPythonCourses.value = reformaterResponse(response, 'python')
-    listOfJSCourses.value = reformaterResponse(response, 'js')
-    listOfCsharpCourses.value = reformaterResponse(response, 'csharp')
-  } catch (error) {
-    console.log('Ошибка при получении данных: ', error)
-  } finally {
-    isLoading.value = false
-  }
+  listOfPythonCourses.value = await coursesStore.GET_COURSES_TITLE('python')
+  listOfJSCourses.value = await coursesStore.GET_COURSES_TITLE('js')
+  listOfCsharpCourses.value = await coursesStore.GET_COURSES_TITLE('csharp')
+  isLoading.value = false
 })
 
-const selectedDifficultyLevel = ref(['Все уровни'])
+const selectedDifficultyLevel = ref<number[]>([4])
 const isFreeCourses = ref(false)
 
 const filterByDifficultyLevel = (list: Ref): ICourseInfo[] => {
-  if (selectedDifficultyLevel.value.includes('Все уровни')) {
+  if (selectedDifficultyLevel.value.includes(4)) {
     return list.value
   } else {
     return list.value.filter((course: ICourseInfo) =>
@@ -74,7 +61,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           <div class="ml-6">
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              value="Все уровни"
+              :value="4"
               hide-details
               color="green"
               density="compact"
@@ -84,7 +71,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              value="Начальный уровень"
+              :value="1"
               hide-details
               color="green"
               density="compact"
@@ -94,7 +81,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              value="Средний уровень"
+              :value="2"
               hide-details
               color="green"
               density="compact"
@@ -104,7 +91,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              value="Продвинутый уровень"
+              :value="3"
               hide-details
               color="green"
               density="compact"
@@ -139,13 +126,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
       </div>
       <div class="content d-flex flex-column ga-3 mt-5">
         <v-divider></v-divider>
-        <div class="d-flex justify-center align-center" style="height: 500px;" v-if="isLoading">
-        <v-progress-circular
-          :size="50"
-          color="green"
-          indeterminate
-        ></v-progress-circular>
-        </div>
+        <PageLoader v-if="isLoading" :height="500" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
@@ -171,13 +152,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
       </div>
       <div class="content d-flex flex-column ga-3 mt-5">
         <v-divider></v-divider>
-        <div class="d-flex justify-center align-center" style="height: 500px;" v-if="isLoading">
-        <v-progress-circular
-          :size="50"
-          color="green"
-          indeterminate
-        ></v-progress-circular>
-        </div>
+        <PageLoader v-if="isLoading" :height="500" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
@@ -203,13 +178,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
       </div>
       <div class="content d-flex flex-column ga-3 mt-5">
         <v-divider></v-divider>
-        <div class="d-flex justify-center align-center" style="height: 500px;" v-if="isLoading">
-        <v-progress-circular
-          :size="50"
-          color="green"
-          indeterminate
-        ></v-progress-circular>
-        </div>
+        <PageLoader v-if="isLoading" :height="500" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
@@ -243,11 +212,8 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
     }
   }
   &-content {
-    width: 70%;
-    padding: {
-      left: 60px;
-      right: 350px;
-    }
+    width:950px;
+    padding-left: 60px;
   }
 }
 </style>

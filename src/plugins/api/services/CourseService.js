@@ -5,8 +5,12 @@ class CourseService {
     return fetchData(`${API_BASE_URL}/courses`);
   }
 
-  async getCourseTitle() {
-    return fetchData(`${API_BASE_URL}/courses/title`);
+  async getCourseTitle(courseType) {
+    return fetchData(`${API_BASE_URL}/courses/title?courseType=${courseType}`);
+  }
+
+  async getCourseProgram(courseId) {
+    return fetchData(`${API_BASE_URL}/courses/title/program?courseId=${courseId}`);
   }
 }
 

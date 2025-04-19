@@ -38,7 +38,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/courses/:lang/:id',
     name: 'Course',
-    component: () => import('@/views/CourseDescription.vue'),
+    component: () => import('@/views/CourseProgram.vue'),
     beforeEnter: checkAuth,
   },
 ];

@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import type { ICourseInfo } from '@/interfaces'
+import { CourseLevels } from '@/enums';
 
 const props = defineProps<{
   course: ICourseInfo
 }>()
+
+const listOfLevels = [
+  { level: CourseLevels.Easy, color: 'blue' },
+  { level: CourseLevels.Medium, color: 'yellow' },
+  { level: CourseLevels.Advanced, color: 'orange' }
+]
 </script>
 
 <template>
@@ -17,14 +24,12 @@ const props = defineProps<{
         </div>
         <p>{{ course.description }}</p>
         <div class="d-flex ga-3">
-          <v-chip :color="course.price === 'Бесплатно' ? 'green' : 'red'" size="small">{{
-            course.price
-          }}</v-chip>
-          <v-chip :color="course.level === 'Начальный уровень' ? 'blue' : course.level === 'Средний уровень' ? 'yellow' : 'orange'"
+          <v-chip :color="course.price === 'Бесплатно' ? 'green' : 'red'" size="small">{{ course.price }}</v-chip>
+          <v-chip :color="listOfLevels[course.level - 1].color"
             variant="flat"
             size="small"
-            >{{ course.level }}</v-chip
-          >
+            >{{ listOfLevels[course.level - 1].level }}
+          </v-chip>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/UserStore.js'
 import { ref } from 'vue'
 import type { ITabs } from '@/interfaces'
 import { useForm, type GenericObject } from 'vee-validate'
-import { regExpForEmail, RegExpForLogin } from '@/use/ValidationForms'
+import { regExpForEmail, RegExpForLogin } from '@/constants/RegExpForForms'
 
 const {
   handleSubmit: regHandleSubmit,
@@ -20,7 +20,8 @@ const {
     },
     regUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
-      else if (!RegExpForLogin.test(value)) return 'Логин должен содержать только латинские буквы и цифры'
+      else if (!RegExpForLogin.test(value))
+        return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
     regPassword(value: string): string | boolean {
@@ -45,7 +46,8 @@ const {
   validationSchema: {
     loginUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
-      else if (!RegExpForLogin.test(value)) return 'Логин должен содержать только латинские буквы и цифры'
+      else if (!RegExpForLogin.test(value))
+        return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
     loginPassword(value: string): string | boolean {
@@ -63,10 +65,8 @@ const [checkPersonalData, checkPersonalDataAttrs] = regDefineField('checkPersona
 const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
 const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
 
-
-const onRegSubmit = regHandleSubmit( async (values: GenericObject) => {
-  await userStore.INIT_CREATE_NEW_USER(values)
-  .finally(() => {
+const onRegSubmit = regHandleSubmit(async (values: GenericObject) => {
+  await userStore.INIT_CREATE_NEW_USER(values).finally(() => {
     tab.value = 2
     resetRegForm()
     resetLoginForm()
@@ -76,15 +76,14 @@ const onRegSubmit = regHandleSubmit( async (values: GenericObject) => {
 
 const onLoginSubmit = loginHandleSubmit(async (values: GenericObject) => {
   loading.value = true
-  await userStore.INIT_AUTORIZATION(values, checkRememberMe.value)
-    .finally(() => {
-      localVisibleForm.value = false
-      resetRegForm()
-      resetLoginForm()
-      loading.value = false
-      tab.value = 1
-      profileMenu.value = false
-    })
+  await userStore.INIT_AUTORIZATION(values, checkRememberMe.value).finally(() => {
+    localVisibleForm.value = false
+    resetRegForm()
+    resetLoginForm()
+    loading.value = false
+    tab.value = 1
+    profileMenu.value = false
+  })
 })
 
 const closeForm = (): void => {
@@ -129,8 +128,7 @@ const loading = ref(false)
           </v-tab>
         </v-tabs>
         <v-spacer></v-spacer>
-        <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text">
-        </v-btn>
+        <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text"> </v-btn>
       </div>
       <hr />
       <v-tabs-window v-model="tab">
@@ -275,8 +273,8 @@ const loading = ref(false)
     font-size: 16px;
   }
 }
-  .form-btn {
-    letter-spacing: 0;
-    font-size: 16px;
-  }
+.form-btn {
+  letter-spacing: 0;
+  font-size: 16px;
+}
 </style>

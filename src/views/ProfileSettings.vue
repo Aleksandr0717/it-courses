@@ -2,9 +2,10 @@
 import { ref, computed } from 'vue'
 import type { INavLink } from '@/interfaces'
 import { useForm } from 'vee-validate'
-import { regExpForEmail } from '@/use/ValidationForms'
+import { regExpForEmail } from '@/constants/RegExpForForms'
 import { useUserStore } from '@/stores/UserStore'
 import { useRouter } from 'vue-router'
+import PageLoader from '@/components/UI/PageLoader.vue'
 
 document.title = 'Настройки профиля'
 const router = useRouter()
@@ -19,15 +20,15 @@ const currentUser = computed({
   },
 })
 
-const educationLevels = ref<string[]>([
+const educationLevels: string[] = [
   'Основное общее',
   'Среднее общее',
   'Среднее профессиональное',
   'Бакалавриат',
   'Специалитет',
   'Магистратура',
-])
-const navLinks = ref<INavLink[]>([
+]
+const navLinks: INavLink[] = [
   {
     id: 1,
     title: 'Личная информация',
@@ -58,7 +59,7 @@ const navLinks = ref<INavLink[]>([
       isDisabledPersonalData.value = true
     },
   },
-])
+]
 
 const {
   handleSubmit: emailHandleSubmit,
@@ -150,13 +151,7 @@ const returnBack = () => {
         <h3>Личная информация</h3>
         <VDivider opacity=".3" />
       </div>
-      <div class="d-flex justify-center align-center" style="height: 400px;" v-if="userStore.isLoading">
-      <v-progress-circular
-        :size="50"
-        color="green"
-        indeterminate
-      ></v-progress-circular>
-      </div>
+      <PageLoader v-if="userStore.isLoading" :height="400" />
       <div v-else>
         <div class="editable-item">
           <label style="margin-right: 58px" for="fam">Фамилия*:</label>
@@ -307,13 +302,7 @@ const returnBack = () => {
         <h3>Изменение почты</h3>
         <VDivider opacity=".3" />
       </div>
-      <div class="loader d-flex justify-center align-center" style="height: 150px;" v-if="userStore.isLoading">
-        <v-progress-circular
-          :size="50"
-          color="blue"
-          indeterminate
-        ></v-progress-circular>
-      </div>
+      <PageLoader v-if="userStore.isLoading" :height="150" />
       <v-form v-else @submit.prevent="saveEmailChange">
         <div class="editable-item ga-6">
           <label for="current-email">Текущий e-mail:</label>
@@ -412,7 +401,7 @@ const returnBack = () => {
   background-color: rgb(233, 233, 233);
 }
 .editable-items {
-  width: 40%;
+  width: 762px;
   .editable-item {
     display: flex;
     margin-top: 25px;
@@ -427,7 +416,7 @@ const returnBack = () => {
   }
 }
 .nav-links {
-  width: 15%;
+  width: 285px;
   padding: {
     inline: 50px;
     top: 20px;

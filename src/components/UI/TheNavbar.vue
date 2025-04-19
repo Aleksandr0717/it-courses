@@ -10,13 +10,13 @@ const { unRegisteredUser } = useCheckRegisteredUser()
 const userStore = useUserStore()
 const router = useRouter()
 
-const listOfLanguages = ref<INavMenu[]>([
+const listOfLanguages: INavMenu[] = [
   { id: 1, title: 'Python', action: () => router.push({ name: 'Courses', params: { lang: 'python' } }) },
   { id: 2, title: 'JavaScript', action: () => router.push({ name: 'Courses', params: { lang: 'js' } }) },
   { id: 3, title: 'C#', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } })  },
-])
+]
 
-const profileItems = ref<INavMenu[]>([
+const profileItems: INavMenu[] = [
   {
     id: 1,
     title: 'Настройки',
@@ -32,7 +32,7 @@ const profileItems = ref<INavMenu[]>([
       router.push({ name: 'Home' })
     },
   },
-])
+]
 
 const autorizationVisible = ref(false)
 const currentUser = computed(() => userStore.currentUser)
@@ -130,7 +130,7 @@ const profileMenu = ref(false)
               icon="mdi-chevron-down"
             ></v-icon>
           </template>
-          {{ currentUser?.fullShortName }}
+          {{ currentUser.fullShortName }}
         </v-btn>
       </template>
       <v-card width="200" elevation="5" tile>
