@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useCoursesStore } from '@/stores/CoursesStore';
 import { useRoute } from 'vue-router';
+import type { ICourseProgram } from '@/interfaces';
 import PageLoader from '@/components/UI/PageLoader.vue';
 
+const courseProgram = ref<ICourseProgram | object>({})
 const route = useRoute()
 const coursesStore = useCoursesStore();
+const isLoading = ref(false)
 // const courseProgram = computed<ICourseProgram>({
 //   get() {
 //     const editCourseProgram: ICourseProgram = Object.assign(coursesStore.courseProgram)
@@ -16,16 +19,16 @@ const coursesStore = useCoursesStore();
 //     courseProgram.value = value
 //   }
 // })
-const courseProgram = computed(() => coursesStore.courseProgram)
-const isLoading = ref(false)
-
 onMounted(async () => {
   isLoading.value = true
-  await coursesStore.GET_COURSE_PROGRAM(parseInt(route.hash[1]))
+  courseProgram.value = await coursesStore.GET_COURSE_PROGRAM(parseInt(route.hash.slice(1)))
+  document.title = courseProgram.value.title
   isLoading.value = false
 })
 
-onBeforeUnmount(() => coursesStore.CLEAR_COURSE_PROGRAM())
+onUnmounted(() => {
+  courseProgram.value = {}
+})
 
 const listForExpansionPanel = ref([
   { title: 'Общая информация о курсе', descList: ['О курсе', 'Как проходить курс', 'Для преподавателей и работы в группах', 'Достижения курса'] },
@@ -54,7 +57,7 @@ const listForExpansionPanel = ref([
     <div v-if="!isLoading" class="content mt-10 d-flex justify-center">
       <div class="content-center d-flex align-start justify-space-between">
         <div class="content-center-detailed-info d-flex justify-center flex-column ga-12 px-14">
-          <div class="d-flex ga-3 flex-column">
+          <div v-if="courseProgram.skills" class="d-flex ga-3 flex-column">
             <h3>Вы научитесь:</h3>
             <ul>
               <li v-for="(list, i) in courseProgram.skills" :key="i">{{ list }}</li>
@@ -62,11 +65,19 @@ const listForExpansionPanel = ref([
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>О курсе:</h3>
-            <p>{{ courseProgram.about }}</p>
+            <p v-if="typeof courseProgram.about === 'object'" 
+              v-for="(str, i) in courseProgram.about" :key="i"
+              >{{ str }}
+            </p>
+            <p v-else>{{ courseProgram.about }}</p>
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>Начальные требования:</h3>
-            <p>{{ courseProgram.requirements }}</p>
+            <p v-if="typeof courseProgram.requirements === 'object'" 
+              v-for="(str, i) in courseProgram.requirements" :key="i"
+              >{{ str }}
+            </p>
+            <p v-else>{{ courseProgram.requirements }}</p>
           </div>
           <div class="d-flex flex-column mb-10">
             <h3 class="mb-3">Программа курса:</h3>
@@ -86,15 +97,18 @@ const listForExpansionPanel = ref([
           </div>
         </div>
         <div class="content-center-general-info d-flex flex-column">
-          <div class="content-center-general-info-sticky">
-            <div class="quantity pa-3 mb-5">
-              <h4>В курс входят:</h4>
-              <ul v-for="(item, i) in courseProgram.includes" :key="i">
-                <li>{{ item }}</li>
-              </ul>
-            </div>
-            <v-btn class="btn text-none" flat color="green" width="200">Записаться на курс</v-btn>
+          <div class="mb-3">
+            <h4>{{ courseProgram.price }}</h4>
+            <h4>{{ courseProgram.level }}</h4>
           </div>
+          <div class="quantity pa-3 mb-5">
+            <h4>В курс входят:</h4>
+            <ul v-for="(item, i) in courseProgram.includes" :key="i">
+              <li>{{ item }}</li>
+            </ul>
+          </div>
+          <v-btn v-if="courseProgram.price === 'Бесплатно'" class="btn text-none" flat color="green" width="200">Записаться на курс</v-btn>
+          <v-btn v-else class="btn text-none" flat color="blue" width="200">Оплатить курс</v-btn>
         </div>
       </div>
     </div>

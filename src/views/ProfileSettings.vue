@@ -107,20 +107,20 @@ const [newPassword, newPasswordAttrs] = passwordDefineField('password')
 const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword')
 
 const savePersonalDataChange = async (): Promise<void> => {
-  await userStore.INIT_UPDATE_USER(currentUser.value)
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
   isDisabledPersonalData.value = true
 }
 
 const saveEmailChange = emailHandleSubmit(async () => {
   currentUser.value.email = newEmail.value
   emailResetForm()
-  await userStore.INIT_UPDATE_USER(currentUser.value)
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
 })
 
 const savePasswordChange = passwordHandleSubmit(async () => {
   currentUser.value.password = newPassword.value
   passwordResetForm()
-  await userStore.INIT_UPDATE_USER(currentUser.value)
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
 })
 
 const isDisabledPersonalData = ref(true)
@@ -158,7 +158,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
           <v-text-field
             v-else
-            v-model="currentUser.lastName"
+            v-model.trim="currentUser.lastName"
             variant="outlined"
             hide-details
             max-width="545"
@@ -171,7 +171,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
           <v-text-field
             v-else
-            v-model="currentUser.name"
+            v-model.trim="currentUser.name"
             variant="outlined"
             hide-details
             max-width="545"
@@ -184,7 +184,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
           <v-text-field
             v-else
-            v-model="currentUser.secondName"
+            v-model.trim="currentUser.secondName"
             variant="outlined"
             hide-details
             max-width="545"
@@ -197,7 +197,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
           <v-text-field
             v-else
-            v-model="currentUser.city"
+            v-model.trim="currentUser.city"
             variant="outlined"
             hide-details
             max-width="545"
@@ -210,7 +210,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
           <v-autocomplete
             v-else
-            v-model="currentUser.education"
+            v-model.trim="currentUser.education"
             max-width="330"
             clearable
             density="comfortable"
@@ -226,7 +226,7 @@ const returnBack = () => {
           <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
           <v-textarea
             v-else
-            v-model="currentUser.aboutMe"
+            v-model.trim="currentUser.aboutMe"
             variant="outlined"
             hide-details="auto"
             maxlength="255"

@@ -7,7 +7,6 @@ import PageLoader from '@/components/UI/PageLoader.vue';
 
 document.title = 'Список курсов'
 const coursesStore = useCoursesStore();
-
 const listOfPythonCourses = ref<ICourseInfo[]>([])
 const listOfJSCourses = ref<ICourseInfo[]>([])
 const listOfCsharpCourses = ref<ICourseInfo[]>([])
@@ -21,22 +20,30 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-const selectedDifficultyLevel = ref<number[]>([4])
+const selectedDifficultyLevel = ref<string[]>(['Все'])
 const isFreeCourses = ref(false)
 
 const filterByDifficultyLevel = (list: Ref): ICourseInfo[] => {
-  if (selectedDifficultyLevel.value.includes(4)) {
+  if (selectedDifficultyLevel.value.includes('Все')) {
     return list.value
   } else {
-    return list.value.filter((course: ICourseInfo) =>
-      selectedDifficultyLevel.value.includes(course.level),
-    )
+    return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level))
   }
 }
 const filteredByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
   if (isFreeCourses.value) {
     return list.value.filter((course: ICourseInfo) => course.price === 'Бесплатно')
   } else return list.value
+}
+
+const updateCourseTitleCard = async (id: number, list: ICourseInfo[]) => {
+  const course = list.find((course: ICourseInfo) => course.id === id)
+  await coursesStore.UPDATE_COURSE_TITLE(course)
+}
+
+const deleteCourseTitleCard = async (id: number, list: ICourseInfo[]) => {
+  const course = list.find((course: ICourseInfo) => course.id === id)
+  await coursesStore.DELETE_COURSE_TITLE(course)
 }
 
 const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses))
@@ -46,6 +53,33 @@ const filteredByDifficultCsharpCoursesList = computed(() =>filterByDifficultyLev
 const filteredByFreePythonCoursesList = computed(() => filteredByFree(filteredByDifficultPythonCoursesList))
 const filteredByFreeJSCoursesList = computed(() => filteredByFree(filteredByDifficultJSCoursesList))
 const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredByDifficultCsharpCoursesList))
+
+const updatePythonTitleCard = async (id: number) => {
+  await updateCourseTitleCard(id, listOfPythonCourses.value)
+}
+
+const updateJSTitleCard = async (id: number) => {
+  await updateCourseTitleCard(id, listOfJSCourses.value)
+}
+
+const updateCsharpTitleCard = async (id: number) => {
+  await updateCourseTitleCard(id, listOfCsharpCourses.value)
+}
+
+const deletePythonTitleCard = async (id: number) => {
+  await deleteCourseTitleCard(id, listOfPythonCourses.value)
+  listOfPythonCourses.value = listOfPythonCourses.value.filter((course: ICourseInfo) => course.id !== id)
+}
+
+const deleteJSTitleCard = async (id: number) => {
+  await deleteCourseTitleCard(id, listOfJSCourses.value)
+  listOfJSCourses.value = listOfJSCourses.value.filter((course: ICourseInfo) => course.id !== id)
+}
+
+const deleteCsharpTitleCard = async (id: number) => {
+  await deleteCourseTitleCard(id, listOfCsharpCourses.value)
+  listOfCsharpCourses.value = listOfCsharpCourses.value.filter((course: ICourseInfo) => course.id !== id)
+}
 </script>
 
 <template>
@@ -61,7 +95,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           <div class="ml-6">
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="4"
+              value="Все"
               hide-details
               color="green"
               density="compact"
@@ -71,7 +105,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="1"
+              value="Начальный уровень"
               hide-details
               color="green"
               density="compact"
@@ -81,7 +115,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="2"
+              value="Средний уровень"
               hide-details
               color="green"
               density="compact"
@@ -91,7 +125,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
             >
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="3"
+              value="Продвинутый уровень"
               hide-details
               color="green"
               density="compact"
@@ -115,7 +149,7 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
         <v-divider></v-divider>
       </div>
     </div>
-    <div v-if="$route.params.lang === 'python'" class="main-content mt-4">
+    <div v-if="$route.params.lang === 'python'" class="main-content mt-4 mb-3">
       <div class="header d-flex justify-center align-center flex-column ga-4">
         <h3>Курсы по Python</h3>
         <p>
@@ -139,10 +173,12 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           :key="course.id"
           :course="course"
           @click="course.action"
+          @update-info="updatePythonTitleCard"
+          @delete-course="deletePythonTitleCard"
         />
       </div>
     </div>
-    <div v-else-if="$route.params.lang === 'js'" class="main-content mt-4">
+    <div v-else-if="$route.params.lang === 'js'" class="main-content mt-4 mb-3">
       <div class="header d-flex justify-center align-center flex-column ga-4">
         <h3>Курсы по JavaScript</h3>
         <p>
@@ -165,10 +201,12 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           :key="course.id"
           :course="course"
           @click="course.action"
+          @update-info="updateJSTitleCard"
+          @delete-course="deleteJSTitleCard"
         />
       </div>
     </div>
-    <div v-else class="main-content mt-4">
+    <div v-else class="main-content mt-4 mb-3">
       <div class="header d-flex justify-center align-center flex-column ga-4">
         <h3>Курсы по C#</h3>
         <p>
@@ -191,6 +229,8 @@ const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredBy
           :key="course.id"
           :course="course"
           @click="course.action"
+          @update-info="updateCsharpTitleCard"
+          @delete-course="deleteCsharpTitleCard"
         />
       </div>
     </div>

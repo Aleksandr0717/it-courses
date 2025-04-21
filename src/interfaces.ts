@@ -11,6 +11,7 @@ export interface IUserInfo {
   city: string
   education: string
   aboutMe: string
+  role: string
   status: string
 }
 
@@ -40,10 +41,11 @@ export interface ICourseType extends INavMenu {
 export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
-  level: number
+  level: string
   courseTypeTitle: string[]
   customId: string
   courseType: string[]
+  status: string
 }
 
 export interface ICourseProgram {
