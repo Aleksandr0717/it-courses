@@ -11,6 +11,8 @@ export interface IUserInfo {
   city: string
   education: string
   aboutMe: string
+  courses: string[]
+  title: string[] 
   role: string
   status: string
 }

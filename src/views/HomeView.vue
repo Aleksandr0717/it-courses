@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { ICourseType } from '@/interfaces'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 import { useCoursesStore } from '@/stores/CoursesStore';
+import { useUserStore } from '@/stores/UserStore';
 import PageLoader from '@/components/UI/PageLoader.vue';
+import PageAlert from '@/components/UI/PageAlert.vue';
 
 document.title = 'Главная'
 const coursesStore = useCoursesStore()
+const userStore = useUserStore()
+const alertMessage = computed(() => userStore.alertMessage)
 const { unRegisteredUser } = useCheckRegisteredUser()
 const coursesTypesList = ref<ICourseType[]>([])
 const isLoading = ref(false)
@@ -20,6 +24,9 @@ onMounted(async () => {
 
 <template>
   <div class="main-content d-flex justify-center">
+    <Transition name="alert">
+      <PageAlert :alert="alertMessage"/>
+    </Transition>
     <div class="main-content-center d-flex flex-column">
       <div class="header d-flex flex-column align-center justify-center">
         <div class="header-logo d-flex align-center justify-center">
@@ -35,7 +42,7 @@ onMounted(async () => {
       </div>
       <PageLoader v-if="isLoading" :height="500" />
       <div v-else class="content d-flex flex-column ga-3">
-        <v-divider></v-divider>
+        <VDivider />
         <div class="card" v-for="item in coursesTypesList" :key="item.id">
           <div class="desc-cards d-flex ga-6 mb-4">
             <img :src="item.img" alt="Логотип" height="170" />
@@ -46,7 +53,7 @@ onMounted(async () => {
                 >Перейти к курсам</v-btn>
             </div>
           </div>
-          <v-divider></v-divider>
+          <VDivider />
         </div>
       </div>
     </div>
@@ -68,12 +75,6 @@ onMounted(async () => {
       }
       p {
         font-size: 18px;
-      }
-    }
-    .content {
-      .btn {
-        letter-spacing: 0;
-        font-size: 16px;
       }
     }
   }

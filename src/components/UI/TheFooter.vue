@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { INavLink } from '@/interfaces';
-import { ref } from 'vue';
 
-const listOfLinks = ref<INavLink[]>([
+const listOfLinks: INavLink[] = [
   { id: 1, title: 'Главная', to: { name: 'Home' } },
   { id: 2, title: 'Курсы по Python', to: { name: 'Courses', params: { lang: 'python' }} },
   { id: 3, title: 'Курсы по JavaScript', to: { name: 'Courses', params: { lang: 'js' }} },
   { id: 4, title: 'Курсы по C#', to: { name: 'Courses', params: { lang: 'csharp' }} },
-])
+]
 </script>
 
 <template>
@@ -21,8 +20,9 @@ const listOfLinks = ref<INavLink[]>([
       :key="link.id" 
       class="nav-link" 
       :to="link.to"
+      active-class="nav-link-active"
       >
-      {{ link.title }}
+        {{ link.title }}
       </router-link>
     </div>
     <div class="social d-flex flex-column align-center justify-center ga-2">
@@ -36,6 +36,7 @@ const listOfLinks = ref<INavLink[]>([
 </template>
 
 <style scoped lang="scss">
+$links-color: rgb(0, 162, 255);
 
 .footer {
   background-color: rgb(34, 34, 34);
@@ -53,8 +54,11 @@ const listOfLinks = ref<INavLink[]>([
       text-decoration: none;
       margin-inline: 8px;
       &:hover {
-        color: rgb(0, 162, 255);
+        color: $links-color;
       }
+    }
+    .nav-link-active {
+      color: $links-color;
     }
   }
   .social {

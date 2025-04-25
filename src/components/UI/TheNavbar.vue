@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import RegForm from './RegForm.vue'
 import { useUserStore } from '@/stores/UserStore'
-import { type INavMenu } from '@/interfaces'
+import type { INavMenu } from '@/interfaces'
 import { useRouter } from 'vue-router'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
+import RegForm from '@/views/RegForm.vue'
 
 const { unRegisteredUser } = useCheckRegisteredUser()
 const userStore = useUserStore()
@@ -13,7 +13,7 @@ const router = useRouter()
 const listOfLanguages: INavMenu[] = [
   { id: 1, title: 'Python', action: () => router.push({ name: 'Courses', params: { lang: 'python' } }) },
   { id: 2, title: 'JavaScript', action: () => router.push({ name: 'Courses', params: { lang: 'js' } }) },
-  { id: 3, title: 'C#', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } })  },
+  { id: 3, title: 'C#', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } }) },
 ]
 
 const profileItems: INavMenu[] = [
@@ -30,6 +30,7 @@ const profileItems: INavMenu[] = [
     action: () => {
       userStore.INIT_LOGOUT()
       router.push({ name: 'Home' })
+      profileMenu.value = false
     },
   },
 ]
@@ -42,14 +43,14 @@ const profileMenu = ref(false)
 
 <template>
   <v-app-bar height="50" class="navbar" flat>
-    <v-btn class="btn-main text-none px-0 ml-0" width="150" height="50" tile @click="$router.push({ name: 'Home' })">
+    <v-btn class="btn text-none px-0 ml-0" width="150" height="50" tile @click="$router.push({ name: 'Home' })">
       <template #prepend>
         <div class="img-bg">
           <img src="https://static.thenounproject.com/png/6135611-84.png" alt="Лого" height="30" />
         </div>
       </template>
-      EasyCode</v-btn
-    >
+      EasyCode
+    </v-btn>
     <v-menu v-if="!unRegisteredUser" open-on-hover open-delay="0" close-delay="100">
       <template #activator="{ props }">
         <v-btn
@@ -63,14 +64,14 @@ const profileMenu = ref(false)
           @mouseleave="addAnimation = false"
         >
           <template #append>
-            <v-icon
+            <VIcon
               :class="{ 'add-animation': addAnimation }"
               size="22"
               icon="mdi-chevron-down"
-            ></v-icon>
+            />
           </template>
-          Курсы</v-btn
-        >
+          Курсы
+        </v-btn>
       </template>
       <v-card width="150" elevation="5" tile>
         <v-list class="pa-0" color="blue">
@@ -82,24 +83,12 @@ const profileMenu = ref(false)
             rounded="0"
             @click="language.action"
           >
-            <v-list-item-title> {{ language.title }} </v-list-item-title>
+            <v-list-item-title>{{ language.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-card>
     </v-menu>
-    <v-spacer></v-spacer>
-    <v-text-field
-      class="search align-center py-0 mr-5"
-      label="Поиск"
-      prepend-inner-icon="mdi-magnify"
-      variant="outlined"
-      max-width="230"
-      density="compact"
-      hide-details
-      single-line
-      bg-color="rgb(105, 105, 105)"
-    >
-    </v-text-field>
+    <VSpacer />
     <v-btn
       v-if="unRegisteredUser"
       class="btn text-none px-0 mr-5"
@@ -109,10 +98,10 @@ const profileMenu = ref(false)
       @click="autorizationVisible = true"
     >
       <template #prepend>
-        <v-icon size="22" icon="mdi-account-circle"></v-icon>
+        <VIcon size="22" icon="mdi-account-circle" />
       </template>
-      Авторизация</v-btn
-      >
+      Авторизация
+    </v-btn>
       <v-menu v-if="!unRegisteredUser" v-model="profileMenu">
         <template #activator="{ props }">
         <v-btn
@@ -124,11 +113,11 @@ const profileMenu = ref(false)
           :loading="userStore.isLoading"
         >
           <template #append>
-            <v-icon
+            <VIcon
               :class="{ 'add-animation': profileMenu }"
               size="22"
               icon="mdi-chevron-down"
-            ></v-icon>
+            />
           </template>
           {{ currentUser.fullShortName }}
         </v-btn>
@@ -144,9 +133,9 @@ const profileMenu = ref(false)
             @click="item.action"
           >
             <template #prepend>
-              <v-icon style="color: #aaafb9" :icon="item.icon"></v-icon>
+              <VIcon style="color: #aaafb9" :icon="item.icon" />
             </template>
-            <v-list-item-title> {{ item.title }} </v-list-item-title>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-card>
@@ -162,13 +151,8 @@ const profileMenu = ref(false)
   .img-bg {
     background-color: white;
   }
-  .btn,
-  .btn-main {
-    letter-spacing: 0;
-    font-size: 16px;
-    &:hover {
-      background-color: rgb(119, 119, 119);
-    }
+  .btn:hover {
+    background-color: rgb(119, 119, 119);
   }
   .add-animation {
     transition: 0.2s;

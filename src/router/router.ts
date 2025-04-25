@@ -1,9 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '../stores/UserStore';
+import { computed } from 'vue';
 
 const checkAuth = (): boolean | object => {
+  const userStore = useUserStore();
+  const alertMessage = computed({
+    get: () => userStore.alertMessage,
+    set: (value) => (userStore.alertMessage = value)
+  })
   if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) {
-    alert('Вы не прошли авторизацию')
+    alertMessage.value = { type: 'warning', message: 'Вы не прошли авторизацию'}
+    setTimeout(() => {
+      alertMessage.value = {}
+    }, 3000)
     return { name: 'Home' };
   }
   return true;
@@ -40,6 +50,11 @@ const routes: RouteRecordRaw[] = [
     name: 'Course',
     component: () => import('@/views/CourseProgram.vue'),
     beforeEnter: checkAuth,
+  },
+  {
+    path: '/:notFound(.*)',
+    name: 'NotFound',
+    component: () => import('@/views/NotFound.vue'),
   },
 ];
 

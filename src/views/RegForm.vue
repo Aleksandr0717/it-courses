@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/UserStore.js'
 import { ref } from 'vue'
 import type { ITabs } from '@/interfaces'
 import { useForm, type GenericObject } from 'vee-validate'
-import { regExpForEmail, RegExpForLogin } from '@/constants/RegExpForForms'
+import { regExpForEmail, regExpForLogin } from '@/constants/RegExpForForms'
 
 const {
   handleSubmit: regHandleSubmit,
@@ -20,7 +20,7 @@ const {
     },
     regUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
-      else if (!RegExpForLogin.test(value))
+      else if (!regExpForLogin.test(value))
         return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
@@ -46,7 +46,7 @@ const {
   validationSchema: {
     loginUsername(value: string): string | boolean {
       if (!value) return 'Поле обязательно для заполнения'
-      else if (!RegExpForLogin.test(value))
+      else if (!regExpForLogin.test(value))
         return 'Логин должен содержать только латинские буквы и цифры'
       return true
     },
@@ -83,6 +83,7 @@ const onLoginSubmit = loginHandleSubmit(async (values: GenericObject) => {
     loading.value = false
     tab.value = 1
     profileMenu.value = false
+    checkRememberMe.value = false
   })
 })
 
@@ -108,26 +109,26 @@ const loading = ref(false)
 
 <template>
   <v-dialog
-    v-model="localVisibleForm"
-    opacity=".7"
-    transition="dialog-bottom-transition"
-    persistent
+  v-model="localVisibleForm"
+  opacity=".7"
+  transition="dialog-bottom-transition"
+  persistent
   >
     <v-card class="pa-2 form-login" width="400">
-      <div class="form-buttons d-flex align-center mb-1">
+      <div class="d-flex align-center mb-1">
         <v-tabs v-model="tab" density="compact">
           <v-tab
             v-for="item in tabsArray"
             :key="item.id"
             :value="item.id"
-            class="form-btn text-none px-0 mx-1"
+            class="btn text-none px-0 mx-1"
             :color="item.color"
             width="120"
           >
             {{ item.title }}
           </v-tab>
         </v-tabs>
-        <v-spacer></v-spacer>
+        <VSpacer />
         <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text"> </v-btn>
       </div>
       <hr />
@@ -138,8 +139,8 @@ const loading = ref(false)
             @submit.prevent="onRegSubmit"
             fast-fail
           >
-            <v-text-field
-              class="search align-center py-0 ml-3"
+            <VTextField
+              class="align-center py-0 ml-3"
               label="Введите логин"
               variant="outlined"
               max-width="330"
@@ -149,9 +150,9 @@ const loading = ref(false)
               :error-messages="regErrors.regUsername"
               v-model.trim="regUsername"
               v-bind="regUsernameAttrs"
-            ></v-text-field>
-            <v-text-field
-              class="search align-center py-0 ml-3"
+            />
+            <VTextField
+              class="align-center py-0 ml-3"
               label="Введите e-mail"
               variant="outlined"
               max-width="330"
@@ -162,10 +163,9 @@ const loading = ref(false)
               :error-messages="regErrors.regEmail"
               v-model.trim="regEmail"
               v-bind="regEmailAttrs"
-            >
-            </v-text-field>
-            <v-text-field
-              class="search align-center py-0 ml-3"
+            />
+            <VTextField
+              class="align-center py-0 ml-3"
               label="Введите пароль"
               type="password"
               variant="outlined"
@@ -177,9 +177,8 @@ const loading = ref(false)
               :error-messages="regErrors.regPassword"
               v-model.trim="regPassword"
               v-bind="regPasswordAttrs"
-            >
-            </v-text-field>
-            <v-checkbox
+            />
+            <VCheckbox
               label="Я соглашаюсь с условиями использования, политикой конфиденциальности и разрешаю обрабатывать мои персональные данные"
               v-model="checkPersonalData"
               v-bind="checkPersonalDataAttrs"
@@ -187,9 +186,9 @@ const loading = ref(false)
               color="green"
               hide-details="auto"
               density="compact"
-            ></v-checkbox>
+            />
             <v-btn
-              class="form-btn text-none px-0 mr-3"
+              class="btn text-none px-0 mr-3"
               height="30"
               color="green"
               flat
@@ -207,8 +206,8 @@ const loading = ref(false)
             @submit.prevent="onLoginSubmit"
             fast-fail
           >
-            <v-text-field
-              class="search align-center py-0 ml-3"
+            <VTextField
+              class="align-center py-0 ml-3"
               label="Введите логин"
               variant="outlined"
               max-width="330"
@@ -219,10 +218,9 @@ const loading = ref(false)
               :error-messages="loginErrors.loginUsername"
               v-model.trim="loginUsername"
               v-bind="loginUsernameAttrs"
-            >
-            </v-text-field>
-            <v-text-field
-              class="search align-center py-0 ml-3"
+            />
+            <VTextField
+              class="align-center py-0 ml-3"
               label="Введите пароль"
               type="password"
               variant="outlined"
@@ -234,19 +232,18 @@ const loading = ref(false)
               :error-messages="loginErrors.loginPassword"
               v-model.trim="loginPassword"
               v-bind="loginPasswordAttrs"
-            >
-            </v-text-field>
-            <div class="form-submit d-flex justify-space-between align-center">
-              <v-checkbox
+            />
+            <div class="d-flex justify-space-between align-center">
+              <VCheckbox
                 class="ml-1"
                 label="Запомнить меня"
                 v-model="checkRememberMe"
                 color="blue"
                 hide-details
                 density="compact"
-              ></v-checkbox>
+              />
               <v-btn
-                class="form-btn text-none px-0 mr-1"
+                class="btn text-none px-0 mr-1"
                 width="100"
                 height="30"
                 color="blue"
@@ -268,13 +265,5 @@ const loading = ref(false)
 <style scoped lang="scss">
 .form-login {
   align-self: center;
-  .form-btn {
-    letter-spacing: 0;
-    font-size: 16px;
-  }
-}
-.form-btn {
-  letter-spacing: 0;
-  font-size: 16px;
 }
 </style>

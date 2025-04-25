@@ -6,12 +6,10 @@ const props = defineProps<{
 
 <template>
   <div class="d-flex justify-center align-center" :style="{ height: height + 'px'}">
-    <v-progress-circular
+    <VProgressCircular
       :size="50"
       color="green"
       indeterminate
-    ></v-progress-circular>
+    />
   </div>
 </template>
-
-<style lang="scss" scoped></style>

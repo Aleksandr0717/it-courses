@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import { useCoursesStore } from '@/stores/CoursesStore';
-import { useRoute } from 'vue-router';
-import type { ICourseProgram } from '@/interfaces';
-import PageLoader from '@/components/UI/PageLoader.vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useCoursesStore } from '@/stores/CoursesStore'
+import { useUserStore } from '@/stores/UserStore'
+import { useRoute } from 'vue-router'
+import type { ICourseProgram } from '@/interfaces'
+import PageLoader from '@/components/UI/PageLoader.vue'
 
 const courseProgram = ref<ICourseProgram | object>({})
 const route = useRoute()
-const coursesStore = useCoursesStore();
+const coursesStore = useCoursesStore()
+const userStore = useUserStore()
+const currentUser = computed(() => userStore.currentUser)
 const isLoading = ref(false)
 // const courseProgram = computed<ICourseProgram>({
 //   get() {
@@ -19,6 +22,10 @@ const isLoading = ref(false)
 //     courseProgram.value = value
 //   }
 // })
+const signUpForCourse = async () => {
+  await userStore.SIGN_UP_FOR_COURSE(currentUser.value, courseProgram.value)
+}
+
 onMounted(async () => {
   isLoading.value = true
   courseProgram.value = await coursesStore.GET_COURSE_PROGRAM(parseInt(route.hash.slice(1)))
@@ -29,6 +36,7 @@ onMounted(async () => {
 onUnmounted(() => {
   courseProgram.value = {}
 })
+
 
 const listForExpansionPanel = ref([
   { title: 'Общая информация о курсе', descList: ['О курсе', 'Как проходить курс', 'Для преподавателей и работы в группах', 'Достижения курса'] },
@@ -67,7 +75,8 @@ const listForExpansionPanel = ref([
             <h3>О курсе:</h3>
             <p v-if="typeof courseProgram.about === 'object'" 
               v-for="(str, i) in courseProgram.about" :key="i"
-              >{{ str }}
+            >
+              {{ str }}
             </p>
             <p v-else>{{ courseProgram.about }}</p>
           </div>
@@ -75,7 +84,8 @@ const listForExpansionPanel = ref([
             <h3>Начальные требования:</h3>
             <p v-if="typeof courseProgram.requirements === 'object'" 
               v-for="(str, i) in courseProgram.requirements" :key="i"
-              >{{ str }}
+            >
+              {{ str }}
             </p>
             <p v-else>{{ courseProgram.requirements }}</p>
           </div>
@@ -107,8 +117,17 @@ const listForExpansionPanel = ref([
               <li>{{ item }}</li>
             </ul>
           </div>
-          <v-btn v-if="courseProgram.price === 'Бесплатно'" class="btn text-none" flat color="green" width="200">Записаться на курс</v-btn>
-          <v-btn v-else class="btn text-none" flat color="blue" width="200">Оплатить курс</v-btn>
+          <v-btn 
+          v-if="courseProgram.price === 'Бесплатно'" 
+          class="btn text-none" 
+          flat 
+          color="green" 
+          width="200"
+          @click="signUpForCourse"
+          >
+            Записаться на курс
+          </v-btn>
+          <v-btn v-else class="btn text-none" flat color="blue" width="200" @click="signUpForCourse">Оплатить курс</v-btn>
         </div>
       </div>
     </div>
@@ -162,20 +181,16 @@ $bg-color: rgb(233, 233, 233);
         width: 200px;
         position: sticky;
         top: 70px;
-          .quantity {
-            background-color: $bg-color;
-            ul {
-              list-style: none;
-              li::before {
-                content: "\203A";
-                margin-right: 10px;
-              }
+        .quantity {
+          background-color: $bg-color;
+          ul {
+            list-style: none;
+            li::before {
+              content: "\203A";
+              margin-right: 10px;
             }
-          }  
-          .btn {
-            letter-spacing: 0;
-            font-size: 16px;
           }
+        }  
       }
     }
   }

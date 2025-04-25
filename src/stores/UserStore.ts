@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { IUserInfo } from '@/interfaces'
+import type { ICourseProgram, IUserInfo } from '@/interfaces'
 import type { GenericObject } from 'vee-validate'
 import { inject, ref } from 'vue'
 
@@ -7,8 +7,9 @@ export const useUserStore = defineStore('userStore', () => {
   const userService: any = inject('userService')
   const currentUser = ref<IUserInfo | object>({})
   const isLoading = ref(false)
+  const alertMessage = ref({})
 
-  const SET_CURRENT_USER = (payload: IUserInfo| object): void => {
+  const SET_CURRENT_USER = (payload: IUserInfo | object): void => {
     currentUser.value = payload
   }
 
@@ -35,17 +36,21 @@ export const useUserStore = defineStore('userStore', () => {
 
   const INIT_AUTORIZATION = async (userInfo: GenericObject, rememberUser: boolean): Promise<void> => {
     try {
-      const response: { user: IUserInfo, message: string } = await userService.authorizationUser(userInfo.loginUsername, userInfo.loginPassword)
-      alert(response.message)
+      const response = await userService.authorizationUser(userInfo.loginUsername, userInfo.loginPassword)
       if (rememberUser) {
         localStorage.setItem('currentUser', JSON.stringify(response.user.id))
       } else {
         sessionStorage.setItem('currentUser', JSON.stringify(response.user.id))
       }
+      alertMessage.value = { type: 'success', message: response.message}
       INIT_CURRENT_USER(response.user.id)
     } catch (error: any) {
       console.error(error.message)
-      alert('Неверный логин или пароль')
+      alertMessage.value = { type: 'error', message: 'Неверный логин или пароль'}
+    } finally {
+      setTimeout(() => {
+        alertMessage.value = {}
+      }, 3000)
     }
   }
 
@@ -64,12 +69,16 @@ export const useUserStore = defineStore('userStore', () => {
       } 
     }
     try {
-      const response = await userService.createUser(userPayload);
-      alert(response.message);
+      const response = await userService.createUser(userPayload)
+      alertMessage.value = { type: 'success', message: response.message}
     } catch (error: any) {
-      console.error('Ошибка при создании пользователя: ', error.message);
+      console.error('Ошибка при создании пользователя: ', error.message)
+    } finally {
+      setTimeout(() => {
+        alertMessage.value = {}
+      }, 3000)
     }
-  };
+  }
   
   const INIT_UPDATE_USER_DATA = async (userData: GenericObject): Promise<void> => {
     const userPayload = {
@@ -86,11 +95,16 @@ export const useUserStore = defineStore('userStore', () => {
       }
     }
     try {
-      await userService.updateUserData(userPayload);
+      await userService.updateUserData(userPayload)
+      alertMessage.value = { type: 'info', message: 'Изменения сохранены'}
     } catch (error: any) {
-      console.error('Ошибка при обновлении данных пользователя: ', error.message);
+      console.error('Ошибка при обновлении данных пользователя: ', error.message)
+    } finally {
+      setTimeout(() => {
+        alertMessage.value = {}
+      }, 3000)
     }
-  };
+  }
 
   const INIT_DELETE_USER = async (userData: IUserInfo): Promise<void> => {
     const userPayload = {
@@ -100,10 +114,10 @@ export const useUserStore = defineStore('userStore', () => {
       }
     }
     try {
-      await userService.updateUserData(userPayload);
+      await userService.updateUserData(userPayload)
     } catch (error: any) {
-      console.error('Ошибка при удалении пользователя: ', error.message);
-    }
+      console.error('Ошибка при удалении пользователя: ', error.message)
+    } 
   };
 
   const INIT_LOGOUT = (): void => {
@@ -112,9 +126,25 @@ export const useUserStore = defineStore('userStore', () => {
     SET_CURRENT_USER({})
   }
 
+  const SIGN_UP_FOR_COURSE = async (userData: IUserInfo, courseProgram: ICourseProgram) => {
+    const userPayload = {
+      id: userData.customId,
+      fields: {
+        Courses: courseProgram.title
+      }
+    } 
+    try {
+      await userService.updateUserData(userPayload)
+      alert('Вы записались на курс')
+    } catch (error: any) {
+      console.error('Ошибка при записи на курс: ', error.message)
+    }
+  }
+
   return {
     currentUser,
     isLoading,
+    alertMessage,
     SET_CURRENT_USER,
     INIT_CREATE_NEW_USER,
     INIT_CURRENT_USER,
@@ -122,5 +152,6 @@ export const useUserStore = defineStore('userStore', () => {
     INIT_UPDATE_USER_DATA,
     INIT_DELETE_USER,
     INIT_LOGOUT,
+    SIGN_UP_FOR_COURSE
   }
 })

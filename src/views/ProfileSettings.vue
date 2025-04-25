@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { INavLink } from '@/interfaces'
-import { useForm } from 'vee-validate'
+import { useForm, type GenericObject } from 'vee-validate'
 import { regExpForEmail } from '@/constants/RegExpForForms'
 import { useUserStore } from '@/stores/UserStore'
 import { useRouter } from 'vue-router'
 import PageLoader from '@/components/UI/PageLoader.vue'
+import PageAlert from '@/components/UI/PageAlert.vue'
 
 document.title = 'Настройки профиля'
 const router = useRouter()
@@ -19,6 +20,7 @@ const currentUser = computed({
     currentUser.value = value
   },
 })
+const alertMessage = computed(() => userStore.alertMessage)
 
 const educationLevels: string[] = [
   'Основное общее',
@@ -88,7 +90,7 @@ const {
       else if (value !== currentUser.value.password) return 'Неверный текущий пароль'
       return true
     },
-    password(value: string): string | boolean {
+    newPassword(value: string): string | boolean {
       if (!value?.length && currentPassword.value) return 'Введите новый пароль'
       else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов'
       else if (value === currentUser.value.password) return 'Новый пароль совпадает с текущим'
@@ -103,24 +105,26 @@ const {
 
 const [newEmail, newEmailAttrs] = emailDefineField('newEmail')
 const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword')
-const [newPassword, newPasswordAttrs] = passwordDefineField('password')
+const [newPassword, newPasswordAttrs] = passwordDefineField('newPassword')
 const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword')
 
 const savePersonalDataChange = async (): Promise<void> => {
-  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
-  isDisabledPersonalData.value = true
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value).finally(() => {
+    isDisabledPersonalData.value = true
+  })
 }
 
-const saveEmailChange = emailHandleSubmit(async () => {
-  currentUser.value.email = newEmail.value
+const saveEmailChange = emailHandleSubmit(async (value: GenericObject) => {
+  currentUser.value.email = value.newEmail
   emailResetForm()
   await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
 })
 
-const savePasswordChange = passwordHandleSubmit(async () => {
-  currentUser.value.password = newPassword.value
-  passwordResetForm()
-  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
+const savePasswordChange = passwordHandleSubmit(async (values: GenericObject) => {
+  currentUser.value.password = values.newPassword
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value).finally(() =>{
+    passwordResetForm()
+  })
 })
 
 const isDisabledPersonalData = ref(true)
@@ -143,8 +147,11 @@ const returnBack = () => {
 
 <template>
   <div class="main d-flex justify-center">
+    <Transition name="alert">
+      <PageAlert :alert="alertMessage"/>
+    </Transition>
     <div class="back-btn">
-      <v-btn variant="text" tile width="40" height="30" icon="mdi-arrow-left" @click="returnBack" />
+      <VBtn variant="text" tile width="40" height="30" icon="mdi-arrow-left" @click="returnBack" />
     </div>
     <div v-if="$route.params.userData === 'personal'" class="editable-items mt-7">
       <div class="header text-center d-flex flex-column">
@@ -156,7 +163,7 @@ const returnBack = () => {
         <div class="editable-item">
           <label style="margin-right: 58px" for="fam">Фамилия*:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
-          <v-text-field
+          <VTextField
             v-else
             v-model.trim="currentUser.lastName"
             variant="outlined"
@@ -164,12 +171,12 @@ const returnBack = () => {
             max-width="545"
             density="comfortable"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item">
           <label style="margin-right: 96px" for="name">Имя*:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
-          <v-text-field
+          <VTextField
             v-else
             v-model.trim="currentUser.name"
             variant="outlined"
@@ -177,12 +184,12 @@ const returnBack = () => {
             max-width="545"
             density="comfortable"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item">
           <label style="margin-right: 63px" for="fam">Отчество:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.secondName }}</p>
-          <v-text-field
+          <VTextField
             v-else
             v-model.trim="currentUser.secondName"
             variant="outlined"
@@ -190,12 +197,12 @@ const returnBack = () => {
             max-width="545"
             density="comfortable"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item">
           <label style="margin-right: 90px" for="city">Город:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.city }}</p>
-          <v-text-field
+          <VTextField
             v-else
             v-model.trim="currentUser.city"
             variant="outlined"
@@ -203,12 +210,12 @@ const returnBack = () => {
             max-width="545"
             density="comfortable"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item">
           <label style="margin-right: 34px" for="education">Образование:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.education }}</p>
-          <v-autocomplete
+          <VAutocomplete
             v-else
             v-model.trim="currentUser.education"
             max-width="330"
@@ -219,12 +226,12 @@ const returnBack = () => {
             :items="educationLevels"
             variant="outlined"
             open-on-clear
-          ></v-autocomplete>
+          />
         </div>
         <div class="editable-item align-start">
           <label style="margin-right: 71px" for="about">Обо мне:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.aboutMe }}</p>
-          <v-textarea
+          <VTextarea
             v-else
             v-model.trim="currentUser.aboutMe"
             variant="outlined"
@@ -234,7 +241,7 @@ const returnBack = () => {
             auto-grow
             max-width="545"
             clearable
-          ></v-textarea>
+          />
         </div>
         <p style="padding-left: 50px; margin-top: 20px; font-size: 13px">
           * - Рекомендуемые для заполнения поля
@@ -277,9 +284,9 @@ const returnBack = () => {
         <v-card>
           <v-card-title class="ml-2 d-flex align-center justify-space-between">
             Подтверждение
-            <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false"
-              ><v-icon>mdi-close</v-icon></v-btn
-            >
+            <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
           </v-card-title>
           <v-card-text>
             Удаление аккаунта приведет к потере прогресса в курсах. Вы точно хотите удалить аккаунт?
@@ -291,8 +298,9 @@ const returnBack = () => {
               variant="flat"
               color="red"
               @click="deleteAccount"
-              >Удалить</v-btn
             >
+              Удалить
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -310,7 +318,7 @@ const returnBack = () => {
         </div>
         <div class="editable-item ga-9">
           <label for="new-email">Новый e-mail:</label>
-          <v-text-field
+          <VTextField
             v-model.trim="newEmail"
             v-bind="newEmailAttrs"
             :error-messages="emailErrors.newEmail"
@@ -319,7 +327,7 @@ const returnBack = () => {
             max-width="520"
             density="comfortable"
             clearable
-          ></v-text-field>
+          />
         </div>
         <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
           Сохранить изменения
@@ -334,7 +342,7 @@ const returnBack = () => {
       <v-form @submit.prevent="savePasswordChange">
         <div class="editable-item justify-space-between">
           <label for="current-password">Текущий пароль:</label>
-          <v-text-field
+          <VTextField
             v-model.trim="currentPassword"
             v-bind="currentPasswordAttrs"
             :error-messages="passwordErrors.currentPassword"
@@ -344,11 +352,11 @@ const returnBack = () => {
             density="comfortable"
             type="password"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item justify-space-between">
           <label for="new-password">Новый пароль:</label>
-          <v-text-field
+          <VTextField
             v-model.trim="newPassword"
             v-bind="newPasswordAttrs"
             :error-messages="passwordErrors.password"
@@ -358,11 +366,11 @@ const returnBack = () => {
             density="comfortable"
             type="password"
             clearable
-          ></v-text-field>
+          />
         </div>
         <div class="editable-item justify-space-between">
           <label for="repeated-password">Повторите пароль:</label>
-          <v-text-field
+          <VTextField
             v-model.trim="repeatedPassword"
             v-bind="repeatedPasswordAttrs"
             :error-messages="passwordErrors.repeatedPassword"
@@ -372,7 +380,7 @@ const returnBack = () => {
             density="comfortable"
             type="password"
             clearable
-          ></v-text-field>
+          />
         </div>
         <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
           Сохранить изменения
@@ -386,8 +394,9 @@ const returnBack = () => {
           active-class="nav-link-active"
           :to="link.to"
           @click="link.action"
-          >{{ link.title }}</router-link
         >
+          {{ link.title }}
+        </router-link>
       </div>
     </div>
   </div>
@@ -411,8 +420,6 @@ const returnBack = () => {
   }
   .btn {
     margin-left: 50px;
-    letter-spacing: 0;
-    font-size: 16px;
   }
 }
 .nav-links {

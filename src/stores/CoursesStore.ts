@@ -1,11 +1,12 @@
 import type { ICourseInfo, ICourseProgram, ICourseType } from "@/interfaces";
 import { defineStore } from "pinia";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import { useRouter } from "vue-router";
 
 export const useCoursesStore = defineStore('coursesStore', () => {
   const courseService: any = inject('courseService')
   const router = useRouter()
+  const alertMessage = ref({})
   
   const GET_COURSES_TYPE = async (): Promise<ICourseType[] | any> => {
     try {
@@ -68,8 +69,13 @@ export const useCoursesStore = defineStore('coursesStore', () => {
     }
     try {
       await courseService.updateCourseTitle(coursePayload)
+      alertMessage.value = { type: 'info', message: 'Изменения сохранены'}
     } catch (error: any) {
       console.error('Ошибка при обновлении карты курса: ', error.message);
+    } finally {
+      setTimeout(() => {
+        alertMessage.value = {}
+      }, 3000)
     }
   }
 
@@ -88,6 +94,7 @@ export const useCoursesStore = defineStore('coursesStore', () => {
   }
 
   return {
+    alertMessage,
     GET_COURSES_TYPE,
     GET_COURSES_TITLE,
     GET_COURSE_PROGRAM,

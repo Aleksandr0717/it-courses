@@ -4,6 +4,8 @@ import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue'
 import { useCoursesStore } from '@/stores/CoursesStore';
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
+import CourseTitleHeader from '@/components/UI/CourseTitleHeader.vue';
+import PageAlert from '@/components/UI/PageAlert.vue';
 
 document.title = 'Список курсов'
 const coursesStore = useCoursesStore();
@@ -11,6 +13,7 @@ const listOfPythonCourses = ref<ICourseInfo[]>([])
 const listOfJSCourses = ref<ICourseInfo[]>([])
 const listOfCsharpCourses = ref<ICourseInfo[]>([])
 const isLoading = ref(false)
+const alertMessage = computed(() => coursesStore.alertMessage)
 
 onMounted(async () => {
   isLoading.value = true
@@ -22,74 +25,85 @@ onMounted(async () => {
 
 const selectedDifficultyLevel = ref<string[]>(['Все'])
 const isFreeCourses = ref(false)
+const searchQueryforPython = ref('')
+const searchQueryforJS = ref('')
+const searchQueryforCsharp = ref('')
 
-const filterByDifficultyLevel = (list: Ref): ICourseInfo[] => {
+const filterByDifficultyLevel = (list: Ref<ICourseInfo[]>): ICourseInfo[] => {
   if (selectedDifficultyLevel.value.includes('Все')) {
     return list.value
   } else {
     return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level))
   }
 }
-const filteredByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
+const filterByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
   if (isFreeCourses.value) {
     return list.value.filter((course: ICourseInfo) => course.price === 'Бесплатно')
   } else return list.value
 }
+const sortByTitle = (list: ComputedRef<ICourseInfo[]>, searchQuery: Ref<string>): ICourseInfo[] => {
+  return list.value.filter((course: ICourseInfo) => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+}
 
-const updateCourseTitleCard = async (id: number, list: ICourseInfo[]) => {
-  const course = list.find((course: ICourseInfo) => course.id === id)
+const updateCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
+  const course = list.value.find((course: ICourseInfo) => course.id === id)
   await coursesStore.UPDATE_COURSE_TITLE(course)
 }
 
-const deleteCourseTitleCard = async (id: number, list: ICourseInfo[]) => {
-  const course = list.find((course: ICourseInfo) => course.id === id)
+const deleteCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
+  const course = list.value.find((course: ICourseInfo) => course.id === id)
   await coursesStore.DELETE_COURSE_TITLE(course)
+  list.value = list.value.filter((course: ICourseInfo) => course.id !== id)
 }
 
 const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses))
 const filteredByDifficultJSCoursesList = computed(() => filterByDifficultyLevel(listOfJSCourses))
 const filteredByDifficultCsharpCoursesList = computed(() =>filterByDifficultyLevel(listOfCsharpCourses))
 
-const filteredByFreePythonCoursesList = computed(() => filteredByFree(filteredByDifficultPythonCoursesList))
-const filteredByFreeJSCoursesList = computed(() => filteredByFree(filteredByDifficultJSCoursesList))
-const filteredByFreeCsharpCoursesList = computed(() => filteredByFree(filteredByDifficultCsharpCoursesList))
+const filteredByFreePythonCoursesList = computed(() => filterByFree(filteredByDifficultPythonCoursesList))
+const filteredByFreeJSCoursesList = computed(() => filterByFree(filteredByDifficultJSCoursesList))
+const filteredByFreeCsharpCoursesList = computed(() => filterByFree(filteredByDifficultCsharpCoursesList))
+
+const sortedPythonCoursesList = computed(() => sortByTitle(filteredByFreePythonCoursesList, searchQueryforPython))
+const sortedJSCoursesList = computed(() => sortByTitle(filteredByFreeJSCoursesList, searchQueryforJS))
+const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpCoursesList, searchQueryforCsharp))
 
 const updatePythonTitleCard = async (id: number) => {
-  await updateCourseTitleCard(id, listOfPythonCourses.value)
+  await updateCourseTitleCard(id, listOfPythonCourses)
 }
 
 const updateJSTitleCard = async (id: number) => {
-  await updateCourseTitleCard(id, listOfJSCourses.value)
+  await updateCourseTitleCard(id, listOfJSCourses)
 }
 
 const updateCsharpTitleCard = async (id: number) => {
-  await updateCourseTitleCard(id, listOfCsharpCourses.value)
+  await updateCourseTitleCard(id, listOfCsharpCourses)
 }
 
 const deletePythonTitleCard = async (id: number) => {
-  await deleteCourseTitleCard(id, listOfPythonCourses.value)
-  listOfPythonCourses.value = listOfPythonCourses.value.filter((course: ICourseInfo) => course.id !== id)
+  await deleteCourseTitleCard(id, listOfPythonCourses)
 }
 
 const deleteJSTitleCard = async (id: number) => {
-  await deleteCourseTitleCard(id, listOfJSCourses.value)
-  listOfJSCourses.value = listOfJSCourses.value.filter((course: ICourseInfo) => course.id !== id)
+  await deleteCourseTitleCard(id, listOfJSCourses)
 }
 
 const deleteCsharpTitleCard = async (id: number) => {
-  await deleteCourseTitleCard(id, listOfCsharpCourses.value)
-  listOfCsharpCourses.value = listOfCsharpCourses.value.filter((course: ICourseInfo) => course.id !== id)
+  await deleteCourseTitleCard(id, listOfCsharpCourses)
 }
 </script>
 
 <template>
   <div class="main d-flex">
+    <Transition name="alert">
+      <PageAlert :alert="alertMessage"/>
+    </Transition>
     <div class="main-filter">
       <div class="main-filter-fixed pt-4 d-flex flex-column">
         <div class="filter-header d-flex justify-center mb-3">
           <h3>Фильтры</h3>
         </div>
-        <v-divider></v-divider>
+        <VDivider />
         <div class="difficulty-level ml-4 mt-3 mb-2">
           <p>Уровень сложности</p>
           <div class="ml-6">
@@ -99,139 +113,152 @@ const deleteCsharpTitleCard = async (id: number) => {
               hide-details
               color="green"
               density="compact"
-              ><template #label>
+              >
+              <template #label>
                 <p>Все уровни</p>
-              </template></v-checkbox
-            >
+              </template>
+            </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
               value="Начальный уровень"
               hide-details
               color="green"
               density="compact"
-              ><template #label>
+              >
+              <template #label>
                 <p>Начальный уровень</p>
-              </template></v-checkbox
-            >
+              </template>
+            </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
               value="Средний уровень"
               hide-details
               color="green"
               density="compact"
-              ><template #label>
+              >
+              <template #label>
                 <p>Средний уровень</p>
-              </template></v-checkbox
-            >
+              </template>
+            </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
               value="Продвинутый уровень"
               hide-details
               color="green"
               density="compact"
-              ><template #label>
+              >
+              <template #label>
                 <p>Продвинутый уровень</p>
-              </template></v-checkbox
-            >
+              </template>
+            </v-checkbox>
           </div>
         </div>
-        <v-divider></v-divider>
+        <VDivider />
         <div class="price ml-4 mt-3">
           <p>Цена</p>
           <div class="ml-6">
-            <v-checkbox v-model="isFreeCourses" hide-details color="green" density="compact"
-              ><template #label>
+            <v-checkbox v-model="isFreeCourses" hide-details color="green" density="compact">
+              <template #label>
                 <p>Только бесплатные</p>
-              </template></v-checkbox
-            >
+              </template>
+            </v-checkbox>
           </div>
         </div>
-        <v-divider></v-divider>
+        <VDivider />
       </div>
     </div>
     <div v-if="$route.params.lang === 'python'" class="main-content mt-4 mb-3">
-      <div class="header d-flex justify-center align-center flex-column ga-4">
-        <h3>Курсы по Python</h3>
-        <p>
-          Курсы, которые помогут вам изучить один из самых популярных языков программирования от
-          базовых конструкций до разработки приложений и работы с данными. Здесь вы найдете курсы
-          как для начинающих, так и для опытных программистов.
-        </p>
-      </div>
+      <course-title-header  v-model="searchQueryforPython">
+        <template #title><h3>Курсы по Python</h3></template>
+        <template #description>
+          <p>
+            Курсы, которые помогут вам изучить один из самых популярных языков программирования от
+            базовых конструкций до разработки приложений и работы с данными. Здесь вы найдете курсы
+            как для начинающих, так и для опытных программистов.
+          </p>
+        </template>
+      </course-title-header>
       <div class="content d-flex flex-column ga-3 mt-5">
-        <v-divider></v-divider>
-        <PageLoader v-if="isLoading" :height="500" />
+        <VDivider />
+        <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
-        <div class="d-flex justify-center" v-else-if="!filteredByFreePythonCoursesList.length">
+        <div class="d-flex justify-center" v-else-if="!sortedPythonCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <CourseTitleCard
-          v-else
-          v-for="course in filteredByFreePythonCoursesList"
-          :key="course.id"
-          :course="course"
-          @click="course.action"
-          @update-info="updatePythonTitleCard"
-          @delete-course="deletePythonTitleCard"
-        />
+        <transition-group name="courses-list" v-else>
+          <CourseTitleCard
+            v-for="course in sortedPythonCoursesList"
+            :key="course.id"
+            :course="course"
+            @click="course.action"
+            @update-info="updatePythonTitleCard"
+            @delete-course="deletePythonTitleCard"
+          />
+        </transition-group>
       </div>
     </div>
     <div v-else-if="$route.params.lang === 'js'" class="main-content mt-4 mb-3">
-      <div class="header d-flex justify-center align-center flex-column ga-4">
-        <h3>Курсы по JavaScript</h3>
-        <p>
-          JavaScript используется для создания веб-приложений, интерфейсов, мобильных приложений,
-          игр, а также в серверной разработке с использованием среды Node.js.
-        </p>
-      </div>
+      <course-title-header v-model="searchQueryforJS">
+        <template #title><h3>Курсы по JavaScript</h3></template>
+        <template #description>
+          <p>
+            JavaScript используется для создания веб-приложений, интерфейсов, мобильных приложений,
+            игр, а также в серверной разработке с использованием среды Node.js.
+          </p>
+        </template>
+      </course-title-header>
       <div class="content d-flex flex-column ga-3 mt-5">
-        <v-divider></v-divider>
-        <PageLoader v-if="isLoading" :height="500" />
+        <VDivider />
+        <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
-        <div class="d-flex justify-center" v-else-if="!filteredByFreeJSCoursesList.length">
+        <div class="d-flex justify-center" v-else-if="!sortedJSCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <CourseTitleCard
-          v-else
-          v-for="course in filteredByFreeJSCoursesList"
-          :key="course.id"
-          :course="course"
-          @click="course.action"
-          @update-info="updateJSTitleCard"
-          @delete-course="deleteJSTitleCard"
-        />
+        <transition-group name="courses-list" v-else>
+          <CourseTitleCard
+            v-for="course in sortedJSCoursesList"
+            :key="course.id"
+            :course="course"
+            @click="course.action"
+            @update-info="updateJSTitleCard"
+            @delete-course="deleteJSTitleCard"
+          />
+        </transition-group>
       </div>
     </div>
     <div v-else class="main-content mt-4 mb-3">
-      <div class="header d-flex justify-center align-center flex-column ga-4">
-        <h3>Курсы по C#</h3>
-        <p>
-          Курсы для тех, кто хочет изучить основы и продвинутые концепции программирования на C#. Вы
-          освоите Unity, LINQ, .NET, бэкенд-разработку на C#, и разработку оконных приложений.
-        </p>
-      </div>
+      <course-title-header v-model="searchQueryforCsharp">
+        <template #title><h3>Курсы по C#</h3></template>
+        <template #description>
+          <p>
+            Курсы для тех, кто хочет изучить основы и продвинутые концепции программирования на C#. Вы  
+            освоите Unity, LINQ, .NET, бэкенд-разработку на C#, и разработку оконных приложений.
+          </p>
+        </template>
+      </course-title-header>
       <div class="content d-flex flex-column ga-3 mt-5">
-        <v-divider></v-divider>
-        <PageLoader v-if="isLoading" :height="500" />
+        <VDivider />
+        <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
           <strong>Выберите уровень сложности</strong>
         </div>
-        <div class="d-flex justify-center" v-else-if="!filteredByFreeCsharpCoursesList.length">
+        <div class="d-flex justify-center" v-else-if="!sortedCsharpCoursesList.length">
           <strong>По выбранному уровню сложности нет бесплатных курсов</strong>
         </div>
-        <CourseTitleCard
-          v-else
-          v-for="course in filteredByFreeCsharpCoursesList"
-          :key="course.id"
-          :course="course"
-          @click="course.action"
-          @update-info="updateCsharpTitleCard"
-          @delete-course="deleteCsharpTitleCard"
-        />
+        <transition-group name="courses-list" v-else>
+          <CourseTitleCard
+            v-for="course in sortedCsharpCoursesList"
+            :key="course.id"
+            :course="course"
+            @click="course.action"
+            @update-info="updateCsharpTitleCard"
+            @delete-course="deleteCsharpTitleCard"
+          />
+        </transition-group>
       </div>
     </div>
   </div>
@@ -254,6 +281,15 @@ const deleteCsharpTitleCard = async (id: number) => {
   &-content {
     width:950px;
     padding-left: 60px;
+  }
+  .courses-list-enter-active,
+  .courses-list-leave-active {
+    transition: all 0.4s ease;
+  }
+  .courses-list-enter-from,
+  .courses-list-leave-to {
+    opacity: 0;
+    transform: translateX(100px);
   }
 }
 </style>

@@ -12,8 +12,8 @@ const emit = defineEmits(['updateInfo', 'deleteCourse'])
 const isEditedCourseInfo = ref(false)
 
 const updateCourseTitleCard = () => {
-  isEditedCourseInfo.value = false
   emit('updateInfo', props.course.id)
+  isEditedCourseInfo.value = false
 }
 
 const deleteCourseTitleCard = () => {
@@ -28,7 +28,7 @@ const confirmDialog = ref(false)
 <template>
   <div class="card">
     <div class="desc-card d-flex ga-6 mb-3">
-      <v-textarea
+      <VTextarea
         @click.stop
         v-if="isEditedCourseInfo"
         v-model.trim="course.img"
@@ -38,12 +38,12 @@ const confirmDialog = ref(false)
         density="compact"
         placeholder="Ссылка на изображение"
         auto-grow
-      ></v-textarea>
+      />
       <img v-else :src="course.img" alt="Логотип" height="110" class="mt-1" />
       <div class="desc-card-text d-flex flex-column ga-2">
         <div class="d-flex flex-column">
           <div class="d-flex align-center ga-1">
-            <v-text-field
+            <VTextField
               @click.stop
               v-if="isEditedCourseInfo"
               v-model.trim="course.title"
@@ -52,7 +52,7 @@ const confirmDialog = ref(false)
               width="500"
               density="compact"
               clearable
-            ></v-text-field>
+            />
             <h4 v-else style="line-height: 1">{{ course.title }}</h4>
             <VSpacer />
             <v-btn
@@ -89,9 +89,9 @@ const confirmDialog = ref(false)
               <v-card>
                 <v-card-title class="ml-2 d-flex align-center justify-space-between">
                   Подтверждение
-                  <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false"
-                    ><v-icon>mdi-close</v-icon></v-btn
-                  >
+                  <v-btn variant="text" size="30" rounded="circle" @click="confirmDialog = false">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
                 </v-card-title>
                 <v-card-text>
                   Вы уверены, что хотите удалить курс «{{ course.title }}»?
@@ -103,13 +103,14 @@ const confirmDialog = ref(false)
                     variant="flat"
                     color="red"
                     @click="deleteCourseTitleCard"
-                    >Удалить</v-btn
                   >
+                    Удалить
+                  </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
           </div>
-          <v-text-field
+          <VTextField
             @click.stop
             v-if="isEditedCourseInfo"
             v-model.trim="course.authors"
@@ -118,10 +119,10 @@ const confirmDialog = ref(false)
             width="500"
             density="compact"
             clearable
-          ></v-text-field>
+          />
           <p v-else>{{ course.authors }}</p>
         </div>
-        <v-textarea
+        <VTextarea
           @click.stop
           v-if="isEditedCourseInfo"
           v-model.trim="course.description"
@@ -132,10 +133,10 @@ const confirmDialog = ref(false)
           clearable
           auto-grow
           no-resize
-        ></v-textarea>
+        />
         <p v-else>{{ course.description }}</p>
         <div class="d-flex ga-3">
-          <v-text-field
+          <VTextField
             @click.stop
             v-if="isEditedCourseInfo"
             v-model.trim="course.price"
@@ -144,11 +145,11 @@ const confirmDialog = ref(false)
             max-width="150"
             density="compact"
             clearable
-          ></v-text-field>
-          <v-chip v-else :color="course.price === 'Бесплатно' ? 'green' : 'red'" size="small">{{
-            course.price
-          }}</v-chip>
-          <v-autocomplete
+          />
+          <v-chip v-else :color="course.price === 'Бесплатно' ? 'green' : 'red'" size="small">
+            {{ course.price }}
+          </v-chip>
+          <VAutocomplete
             @click.stop
             v-if="isEditedCourseInfo"
             v-model.trim="course.level"
@@ -159,24 +160,19 @@ const confirmDialog = ref(false)
             :items="['Начальный уровень', 'Средний уровень', 'Продвинутый уровень']"
             variant="outlined"
             open-on-clear
-          ></v-autocomplete>
-          <v-chip
-            v-else
-            :color="
-              course.level === 'Начальный уровень'
-                ? 'blue'
-                : course.level === 'Средний уровень'
-                  ? 'yellow'
-                  : 'orange'
-            "
+          />
+          <v-chip 
+            v-else 
+            :color="course.level === 'Начальный уровень' ? 'blue' : course.level === 'Средний уровень' ? 'yellow' : 'orange'"
             variant="flat"
             size="small"
-            >{{ course.level }}
+          >
+            {{ course.level }}
           </v-chip>
         </div>
       </div>
     </div>
-    <v-divider></v-divider>
+    <VDivider />
   </div>
 </template>
 
