@@ -25,7 +25,7 @@ export const useUserStore = defineStore('userStore', () => {
         response.fullShortName =
           response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.'
       } else response.fullShortName = '@' + response.login
-      
+
       SET_CURRENT_USER(response)
     } catch (error: any) {
       console.error(error.message)
@@ -66,7 +66,7 @@ export const useUserStore = defineStore('userStore', () => {
         City: '',
         Education: '',
         AboutMe: '',
-      } 
+      }
     }
     try {
       const response = await userService.createUser(userPayload)
@@ -79,7 +79,7 @@ export const useUserStore = defineStore('userStore', () => {
       }, 3000)
     }
   }
-  
+
   const INIT_UPDATE_USER_DATA = async (userData: GenericObject): Promise<void> => {
     const userPayload = {
       id: userData.customId,
@@ -117,25 +117,31 @@ export const useUserStore = defineStore('userStore', () => {
       await userService.updateUserData(userPayload)
     } catch (error: any) {
       console.error('Ошибка при удалении пользователя: ', error.message)
-    } 
+    }
   };
 
   const INIT_LOGOUT = (): void => {
-    if (localStorage.getItem('currentUser')) localStorage.removeItem('currentUser') 
+    if (localStorage.getItem('currentUser')) localStorage.removeItem('currentUser')
     else sessionStorage.removeItem('currentUser')
     SET_CURRENT_USER({})
   }
 
   const SIGN_UP_FOR_COURSE = async (userData: IUserInfo, courseProgram: ICourseProgram) => {
+    console.log(currentUser.value.courses)
+let cources = currentUser.value.courses
+cources = cources.push(courseProgram.courseId)
     const userPayload = {
       id: userData.customId,
       fields: {
-        Courses: courseProgram.title
+        Courses: cources
       }
-    } 
+    }
+    console.log(userPayload)
+    console.log(currentUser.value)
+    return
     try {
       await userService.updateUserData(userPayload)
-      alert('Вы записались на курс')
+      alertMessage.value = { type: 'success', message: 'Вы записались на курс'}
     } catch (error: any) {
       console.error('Ошибка при записи на курс: ', error.message)
     }

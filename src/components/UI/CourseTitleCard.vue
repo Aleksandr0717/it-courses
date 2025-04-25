@@ -8,21 +8,23 @@ const currentUser = computed(() => userStore.currentUser)
 const props = defineProps<{
   course: ICourseInfo
 }>()
-const emit = defineEmits(['updateInfo', 'deleteCourse'])
+const emit = defineEmits(['updateInfo', 'deleteCourse', 'editCard'])
 const isEditedCourseInfo = ref(false)
-
 const updateCourseTitleCard = () => {
+  isEditedCourseInfo.value = false;
+  emit('editCard', false)
   emit('updateInfo', props.course.id)
-  isEditedCourseInfo.value = false
 }
 
 const deleteCourseTitleCard = () => {
-  isEditedCourseInfo.value = false
+  isEditedCourseInfo.value = false;
   confirmDialog.value = false
+  emit('editCard', false)
   emit('deleteCourse', props.course.id)
 }
 
 const confirmDialog = ref(false)
+
 </script>
 
 <template>
@@ -57,7 +59,10 @@ const confirmDialog = ref(false)
             <VSpacer />
             <v-btn
               v-if="!isEditedCourseInfo && currentUser.role === 'Admin'"
-              @click.stop="isEditedCourseInfo = true"
+              @click="()=> {
+                emit('editCard', true);
+                isEditedCourseInfo = true
+                }"
               variant="outlined"
               rounded="xl"
               size="30"
@@ -161,8 +166,8 @@ const confirmDialog = ref(false)
             variant="outlined"
             open-on-clear
           />
-          <v-chip 
-            v-else 
+          <v-chip
+            v-else
             :color="course.level === 'Начальный уровень' ? 'blue' : course.level === 'Средний уровень' ? 'yellow' : 'orange'"
             variant="flat"
             size="small"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ICourseInfo } from '@/interfaces'
-import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, onMounted, ref, type ComputedRef, type Ref, watch } from 'vue'
 import { useCoursesStore } from '@/stores/CoursesStore';
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
@@ -28,6 +28,7 @@ const isFreeCourses = ref(false)
 const searchQueryforPython = ref('')
 const searchQueryforJS = ref('')
 const searchQueryforCsharp = ref('')
+const isEditedCourseInfo = ref(false)
 
 const filterByDifficultyLevel = (list: Ref<ICourseInfo[]>): ICourseInfo[] => {
   if (selectedDifficultyLevel.value.includes('Все')) {
@@ -48,6 +49,7 @@ const sortByTitle = (list: ComputedRef<ICourseInfo[]>, searchQuery: Ref<string>)
 const updateCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
   const course = list.value.find((course: ICourseInfo) => course.id === id)
   await coursesStore.UPDATE_COURSE_TITLE(course)
+  isEditedCourseInfo.value = false
 }
 
 const deleteCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
@@ -70,6 +72,7 @@ const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpC
 
 const updatePythonTitleCard = async (id: number) => {
   await updateCourseTitleCard(id, listOfPythonCourses)
+
 }
 
 const updateJSTitleCard = async (id: number) => {
@@ -91,6 +94,12 @@ const deleteJSTitleCard = async (id: number) => {
 const deleteCsharpTitleCard = async (id: number) => {
   await deleteCourseTitleCard(id, listOfCsharpCourses)
 }
+
+const clickOnCource = (course) =>{
+  if(isEditedCourseInfo.value) return;
+  course.action();
+}
+
 </script>
 
 <template>
@@ -192,7 +201,8 @@ const deleteCsharpTitleCard = async (id: number) => {
             v-for="course in sortedPythonCoursesList"
             :key="course.id"
             :course="course"
-            @click="course.action"
+            @edit-card="(event)=> isEditedCourseInfo = event"
+            @click="clickOnCource(course)"
             @update-info="updatePythonTitleCard"
             @delete-course="deletePythonTitleCard"
           />
@@ -235,7 +245,7 @@ const deleteCsharpTitleCard = async (id: number) => {
         <template #title><h3>Курсы по C#</h3></template>
         <template #description>
           <p>
-            Курсы для тех, кто хочет изучить основы и продвинутые концепции программирования на C#. Вы  
+            Курсы для тех, кто хочет изучить основы и продвинутые концепции программирования на C#. Вы
             освоите Unity, LINQ, .NET, бэкенд-разработку на C#, и разработку оконных приложений.
           </p>
         </template>
