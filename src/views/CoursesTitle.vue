@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { ICourseInfo } from '@/interfaces'
-import { computed, onMounted, ref, type ComputedRef, type Ref, watch } from 'vue'
+import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue'
 import { useCoursesStore } from '@/stores/CoursesStore';
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
 import CourseTitleHeader from '@/components/UI/CourseTitleHeader.vue';
-import PageAlert from '@/components/UI/PageAlert.vue';
 
 document.title = 'Список курсов'
 const coursesStore = useCoursesStore();
@@ -13,7 +12,6 @@ const listOfPythonCourses = ref<ICourseInfo[]>([])
 const listOfJSCourses = ref<ICourseInfo[]>([])
 const listOfCsharpCourses = ref<ICourseInfo[]>([])
 const isLoading = ref(false)
-const alertMessage = computed(() => coursesStore.alertMessage)
 
 onMounted(async () => {
   isLoading.value = true
@@ -46,13 +44,13 @@ const sortByTitle = (list: ComputedRef<ICourseInfo[]>, searchQuery: Ref<string>)
   return list.value.filter((course: ICourseInfo) => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
 }
 
-const updateCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
+const updateCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>): Promise<void> => {
   const course = list.value.find((course: ICourseInfo) => course.id === id)
   await coursesStore.UPDATE_COURSE_TITLE(course)
   isEditedCourseInfo.value = false
 }
 
-const deleteCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>) => {
+const deleteCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>): Promise<void> => {
   const course = list.value.find((course: ICourseInfo) => course.id === id)
   await coursesStore.DELETE_COURSE_TITLE(course)
   list.value = list.value.filter((course: ICourseInfo) => course.id !== id)
@@ -70,32 +68,31 @@ const sortedPythonCoursesList = computed(() => sortByTitle(filteredByFreePythonC
 const sortedJSCoursesList = computed(() => sortByTitle(filteredByFreeJSCoursesList, searchQueryforJS))
 const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpCoursesList, searchQueryforCsharp))
 
-const updatePythonTitleCard = async (id: number) => {
+const updatePythonTitleCard = async (id: number): Promise<void> => {
   await updateCourseTitleCard(id, listOfPythonCourses)
-
 }
 
-const updateJSTitleCard = async (id: number) => {
+const updateJSTitleCard = async (id: number): Promise<void> => {
   await updateCourseTitleCard(id, listOfJSCourses)
 }
 
-const updateCsharpTitleCard = async (id: number) => {
+const updateCsharpTitleCard = async (id: number): Promise<void> => {
   await updateCourseTitleCard(id, listOfCsharpCourses)
 }
 
-const deletePythonTitleCard = async (id: number) => {
+const deletePythonTitleCard = async (id: number): Promise<void> => {
   await deleteCourseTitleCard(id, listOfPythonCourses)
 }
 
-const deleteJSTitleCard = async (id: number) => {
+const deleteJSTitleCard = async (id: number): Promise<void> => {
   await deleteCourseTitleCard(id, listOfJSCourses)
 }
 
-const deleteCsharpTitleCard = async (id: number) => {
+const deleteCsharpTitleCard = async (id: number): Promise<void> => {
   await deleteCourseTitleCard(id, listOfCsharpCourses)
 }
 
-const clickOnCource = (course) =>{
+const clickOnCource = (course: ICourseInfo): void =>{
   if(isEditedCourseInfo.value) return;
   course.action();
 }
@@ -104,9 +101,6 @@ const clickOnCource = (course) =>{
 
 <template>
   <div class="main d-flex">
-    <Transition name="alert">
-      <PageAlert :alert="alertMessage"/>
-    </Transition>
     <div class="main-filter">
       <div class="main-filter-fixed pt-4 d-flex flex-column">
         <div class="filter-header d-flex justify-center mb-3">
@@ -201,7 +195,7 @@ const clickOnCource = (course) =>{
             v-for="course in sortedPythonCoursesList"
             :key="course.id"
             :course="course"
-            @edit-card="(event)=> isEditedCourseInfo = event"
+            @edit-card="(value) => isEditedCourseInfo = value"
             @click="clickOnCource(course)"
             @update-info="updatePythonTitleCard"
             @delete-course="deletePythonTitleCard"
@@ -233,7 +227,8 @@ const clickOnCource = (course) =>{
             v-for="course in sortedJSCoursesList"
             :key="course.id"
             :course="course"
-            @click="course.action"
+            @edit-card="(value) => isEditedCourseInfo = value"
+            @click="clickOnCource(course)"
             @update-info="updateJSTitleCard"
             @delete-course="deleteJSTitleCard"
           />
@@ -264,7 +259,8 @@ const clickOnCource = (course) =>{
             v-for="course in sortedCsharpCoursesList"
             :key="course.id"
             :course="course"
-            @click="course.action"
+            @edit-card="(value) => isEditedCourseInfo = value"
+            @click="clickOnCource(course)"
             @update-info="updateCsharpTitleCard"
             @delete-course="deleteCsharpTitleCard"
           />

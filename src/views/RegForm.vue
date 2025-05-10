@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/UserStore.js'
 import { ref } from 'vue'
-import type { ITabs } from '@/interfaces'
+import type { INavList } from '@/interfaces'
 import { useForm, type GenericObject } from 'vee-validate'
 import { regExpForEmail, regExpForLogin } from '@/constants/RegExpForForms'
 
@@ -94,7 +94,7 @@ const closeForm = (): void => {
   checkRememberMe.value = false
 }
 
-const tabsArray = ref<ITabs[]>([
+const tabsArray = ref<INavList[]>([
   { id: 1, title: 'Регистрация', color: 'green' },
   { id: 2, title: 'Вход', color: 'blue' },
 ])
@@ -105,6 +105,8 @@ const profileMenu = defineModel<boolean>('profileMenu')
 const checkRememberMe = ref(false)
 const tab = ref<number | null>(null)
 const loading = ref(false)
+const showRegPassword = ref(false)
+const showLoginPassword = ref(false)
 </script>
 
 <template>
@@ -167,7 +169,6 @@ const loading = ref(false)
             <VTextField
               class="align-center py-0 ml-3"
               label="Введите пароль"
-              type="password"
               variant="outlined"
               max-width="330"
               bg-color="#FFFFFF4D"
@@ -177,6 +178,9 @@ const loading = ref(false)
               :error-messages="regErrors.regPassword"
               v-model.trim="regPassword"
               v-bind="regPasswordAttrs"
+              :append-inner-icon="showRegPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showRegPassword ? 'text' : 'password'"
+              @click:append-inner="showRegPassword = !showRegPassword"
             />
             <VCheckbox
               label="Я соглашаюсь с условиями использования, политикой конфиденциальности и разрешаю обрабатывать мои персональные данные"
@@ -222,7 +226,6 @@ const loading = ref(false)
             <VTextField
               class="align-center py-0 ml-3"
               label="Введите пароль"
-              type="password"
               variant="outlined"
               max-width="330"
               bg-color="#FFFFFF4D"
@@ -232,6 +235,9 @@ const loading = ref(false)
               :error-messages="loginErrors.loginPassword"
               v-model.trim="loginPassword"
               v-bind="loginPasswordAttrs"
+              :append-inner-icon="showLoginPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showLoginPassword ? 'text' : 'password'"
+              @click:append-inner="showLoginPassword = !showLoginPassword"
             />
             <div class="d-flex justify-space-between align-center">
               <VCheckbox

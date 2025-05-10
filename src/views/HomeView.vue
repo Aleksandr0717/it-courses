@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { ICourseType } from '@/interfaces'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 import { useCoursesStore } from '@/stores/CoursesStore';
-import { useUserStore } from '@/stores/UserStore';
 import PageLoader from '@/components/UI/PageLoader.vue';
-import PageAlert from '@/components/UI/PageAlert.vue';
 
 document.title = 'Главная'
 const coursesStore = useCoursesStore()
-const userStore = useUserStore()
-const alertMessage = computed(() => userStore.alertMessage)
 const { unRegisteredUser } = useCheckRegisteredUser()
 const coursesTypesList = ref<ICourseType[]>([])
 const isLoading = ref(false)
@@ -24,9 +20,6 @@ onMounted(async () => {
 
 <template>
   <div class="main-content d-flex justify-center">
-    <Transition name="alert">
-      <PageAlert :alert="alertMessage"/>
-    </Transition>
     <div class="main-content-center d-flex flex-column">
       <div class="header d-flex flex-column align-center justify-center">
         <div class="header-logo d-flex align-center justify-center">
@@ -36,7 +29,7 @@ onMounted(async () => {
           Фронтенд и бэкенд, мобильная разработка и создание игр, популярные языки — выбирайте, что
           нравится, практикуйтесь на реальных бизнес-задачах.
         </p>
-        <p style="color: blue">
+        <p v-if="unRegisteredUser" style="color: blue">
           Доступ к курсам предоставляется только авторизованным пользователям!
         </p>
       </div>

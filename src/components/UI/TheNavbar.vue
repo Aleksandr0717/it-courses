@@ -5,28 +5,38 @@ import type { INavMenu } from '@/interfaces'
 import { useRouter } from 'vue-router'
 import { useCheckRegisteredUser } from '@/use/CheckRegisteredUser'
 import RegForm from '@/views/RegForm.vue'
+import { useUpperCaseFirstLetter } from '@/use/UpperCaseFirstLetter'
 
 const { unRegisteredUser } = useCheckRegisteredUser()
 const userStore = useUserStore()
 const router = useRouter()
 
 const listOfLanguages: INavMenu[] = [
-  { id: 1, title: 'Python', action: () => router.push({ name: 'Courses', params: { lang: 'python' } }) },
-  { id: 2, title: 'JavaScript', action: () => router.push({ name: 'Courses', params: { lang: 'js' } }) },
-  { id: 3, title: 'C#', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } }) },
+  { id: 1, title: 'Python', color: 'blue',  action: () => router.push({ name: 'Courses', params: { lang: 'python' } }) },
+  { id: 2, title: 'JavaScript', color: 'yellow', action: () => router.push({ name: 'Courses', params: { lang: 'js' } }) },
+  { id: 3, title: 'C#', color: 'purple', action: () => router.push({ name: 'Courses', params: { lang: 'csharp' } }) },
 ]
 
 const profileItems: INavMenu[] = [
   {
     id: 1,
+    title: 'Профиль',
+    icon: 'mdi-account',
+    color: 'green',
+    action: () => router.push({ name: 'Profile' }),
+  },
+  {
+    id: 2,
     title: 'Настройки',
     icon: 'mdi-cog-outline',
+    color: 'blue',
     action: () => router.push({ name: 'Settings', params: { userData: 'personal' } }),
   },
   {
     id: 3,
     title: 'Выход',
     icon: 'mdi-import',
+    color: 'red',
     action: () => {
       userStore.INIT_LOGOUT()
       router.push({ name: 'Home' })
@@ -39,6 +49,14 @@ const autorizationVisible = ref(false)
 const currentUser = computed(() => userStore.currentUser)
 const addAnimation = ref(false)
 const profileMenu = ref(false)
+const fullShortName = computed(() => {
+  if (currentUser.value?.name && currentUser.value?.lastName && currentUser.value?.secondName) {
+    return useUpperCaseFirstLetter(currentUser.value?.lastName) + ' ' + currentUser.value?.name[0].toUpperCase() 
+      + '.' + currentUser.value?.secondName[0].toUpperCase() + '.';
+  } else if (currentUser.value?.name && currentUser.value?.lastName) {
+    return useUpperCaseFirstLetter(currentUser.value?.lastName) + ' ' + currentUser.value?.name[0].toUpperCase() + '.';
+  } else return '@' + currentUser.value?.login
+})
 </script>
 
 <template>
@@ -65,7 +83,7 @@ const profileMenu = ref(false)
         >
           <template #append>
             <VIcon
-              :class="{ 'add-animation': addAnimation }"
+              :class="[{ 'add-animation': addAnimation }, { 'reset-animation': !addAnimation }]"
               size="22"
               icon="mdi-chevron-down"
             />
@@ -79,6 +97,7 @@ const profileMenu = ref(false)
             v-for="language in listOfLanguages"
             :key="language.id"
             :value="language.id"
+            :color="language.color"
             min-height="32"
             rounded="0"
             @click="language.action"
@@ -114,16 +133,16 @@ const profileMenu = ref(false)
         >
           <template #append>
             <VIcon
-              :class="{ 'add-animation': profileMenu }"
+              :class="[{ 'add-animation': profileMenu }, { 'reset-animation': !profileMenu }]"
               size="22"
               icon="mdi-chevron-down"
             />
           </template>
-          {{ currentUser.fullShortName }}
+          {{ fullShortName }}
         </v-btn>
       </template>
       <v-card width="200" elevation="5" tile>
-        <v-list class="pa-0" color="green" slim>
+        <v-list class="pa-0" slim>
           <v-list-item
             v-for="item in profileItems"
             :key="item.id"
@@ -131,9 +150,10 @@ const profileMenu = ref(false)
             min-height="32"
             rounded="0"
             @click="item.action"
+            :color="item.color"
           >
             <template #prepend>
-              <VIcon style="color: #aaafb9" :icon="item.icon" />
+              <VIcon :color="item.color" :icon="item.icon" />
             </template>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
@@ -155,8 +175,11 @@ const profileMenu = ref(false)
     background-color: rgb(119, 119, 119);
   }
   .add-animation {
-    transition: 0.2s;
+    transition: all 0.2s ease;
     transform: rotate(180deg);
+  }
+  .reset-animation {
+    transition: all 0.2s ease;
   }
 }
 </style>

@@ -1,5 +1,6 @@
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, type ComputedRef } from "vue";
 import { useUserStore } from "@/stores/UserStore";
+import type { IUserInfo } from "@/interfaces";
 
 export function useCheckRegisteredUser() {
   const userStore = useUserStore();
@@ -22,8 +23,8 @@ export function useCheckRegisteredUser() {
     }
   })
 
-  watch(currentUser, (newValue: object) => {
-    if (Object.keys(newValue)?.length) unRegisteredUser.value = false;
+  watch(currentUser, (newValue: ComputedRef<IUserInfo | null>) => {
+    if (newValue) unRegisteredUser.value = false;
     else {
       unRegisteredUser.value = true;
     }

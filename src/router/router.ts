@@ -12,7 +12,7 @@ const checkAuth = (): boolean | object => {
   if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) {
     alertMessage.value = { type: 'warning', message: 'Вы не прошли авторизацию'}
     setTimeout(() => {
-      alertMessage.value = {}
+      alertMessage.value = null
     }, 3000)
     return { name: 'Home' };
   }
@@ -34,6 +34,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/settings',
     redirect: { name: 'Settings', params: { userData: 'personal' } },
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/views/UserProfile.vue'),
+    beforeEnter: checkAuth,
   },
   {
     path: '/courses/:lang',

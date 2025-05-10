@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia'
-import type { ICourseProgram, IUserInfo } from '@/interfaces'
+import { type IAlert, type ICourseProgram, type IUserInfo } from '@/interfaces'
 import type { GenericObject } from 'vee-validate'
 import { inject, ref } from 'vue'
 
 export const useUserStore = defineStore('userStore', () => {
   const userService: any = inject('userService')
-  const currentUser = ref<IUserInfo | object>({})
+  const currentUser = ref<IUserInfo | null>(null)
   const isLoading = ref(false)
-  const alertMessage = ref({})
+  const alertMessage = ref<IAlert | null>(null)
 
-  const SET_CURRENT_USER = (payload: IUserInfo | object): void => {
+  const SET_CURRENT_USER = (payload: IUserInfo | null): void => {
     currentUser.value = payload
   }
 
@@ -17,15 +17,6 @@ export const useUserStore = defineStore('userStore', () => {
     isLoading.value = true
     try {
       const response: IUserInfo = await userService.getUserById(userId)
-
-      if (response.name && response.lastName && response.secondName) {
-        response.fullShortName =
-          response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.' + response.secondName[0].toUpperCase() + '.'
-      } else if (response.name && response.lastName) {
-        response.fullShortName =
-          response.lastName[0].toUpperCase() + response.lastName.slice(1) + ' ' + response.name[0].toUpperCase() + '.'
-      } else response.fullShortName = '@' + response.login
-
       SET_CURRENT_USER(response)
     } catch (error: any) {
       console.error(error.message)
@@ -49,7 +40,7 @@ export const useUserStore = defineStore('userStore', () => {
       alertMessage.value = { type: 'error', message: 'Неверный логин или пароль'}
     } finally {
       setTimeout(() => {
-        alertMessage.value = {}
+        alertMessage.value = null
       }, 3000)
     }
   }
@@ -66,6 +57,9 @@ export const useUserStore = defineStore('userStore', () => {
         City: '',
         Education: '',
         AboutMe: '',
+        Role: 'User',
+        Status: 'Active',
+        Courses: ['rec7TNF12ehSuIY9X']
       }
     }
     try {
@@ -75,7 +69,7 @@ export const useUserStore = defineStore('userStore', () => {
       console.error('Ошибка при создании пользователя: ', error.message)
     } finally {
       setTimeout(() => {
-        alertMessage.value = {}
+        alertMessage.value = null
       }, 3000)
     }
   }
@@ -101,7 +95,7 @@ export const useUserStore = defineStore('userStore', () => {
       console.error('Ошибка при обновлении данных пользователя: ', error.message)
     } finally {
       setTimeout(() => {
-        alertMessage.value = {}
+        alertMessage.value = null
       }, 3000)
     }
   }
@@ -123,27 +117,27 @@ export const useUserStore = defineStore('userStore', () => {
   const INIT_LOGOUT = (): void => {
     if (localStorage.getItem('currentUser')) localStorage.removeItem('currentUser')
     else sessionStorage.removeItem('currentUser')
-    SET_CURRENT_USER({})
+    SET_CURRENT_USER(null)
   }
 
   const SIGN_UP_FOR_COURSE = async (userData: IUserInfo, courseProgram: ICourseProgram) => {
-    console.log(currentUser.value.courses)
-let cources = currentUser.value.courses
-cources = cources.push(courseProgram.courseId)
+    const courses = currentUser.value?.courses
+    courses?.push(courseProgram.customId)
     const userPayload = {
       id: userData.customId,
       fields: {
-        Courses: cources
+        Courses: courses
       }
     }
-    console.log(userPayload)
-    console.log(currentUser.value)
-    return
     try {
       await userService.updateUserData(userPayload)
       alertMessage.value = { type: 'success', message: 'Вы записались на курс'}
     } catch (error: any) {
       console.error('Ошибка при записи на курс: ', error.message)
+    } finally {
+      setTimeout(() => {
+        alertMessage.value = null
+      }, 3000)
     }
   }
 

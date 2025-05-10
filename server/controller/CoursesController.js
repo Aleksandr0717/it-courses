@@ -27,7 +27,6 @@ router.get('/', (req, res) => {
     })
 })
 
-//отфильтрованный список курсов по языку программирования
 router.get('/title/filtered', (req, res) => {
   const { courseType } = req.query
   airtable

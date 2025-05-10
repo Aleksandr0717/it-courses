@@ -8,5 +8,5 @@
 }
 .alert-enter-from,
 .alert-leave-to {
-  transform: translateX(360px);
+  transform: translateX(350px);
 }

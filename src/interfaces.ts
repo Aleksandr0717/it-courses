@@ -1,42 +1,24 @@
-export interface IUserInfo {
-  id: number
-  customId: string
-  lastName: string
-  name: string
-  secondName: string
-  fullShortName: string
-  login: string
-  password: string
-  email: string
-  city: string
-  education: string
-  aboutMe: string
-  courses: string[]
-  title: string[] 
-  role: string
-  status: string
-}
-
-export interface INavMenu {
+export interface INavList {
   id: number
   title: string
+  color?: string
+}
+
+export interface INavMenu extends INavList {
   icon?: string
-  action?: () => void
+  action: () => void 
 }
 
-export interface ITabs extends INavMenu {
-  color: string
-}
-
-export interface INavLink extends INavMenu {
+export interface INavLink extends INavList {
   to: object
-  addClass?: boolean,
+  addClass?: boolean
+  action?: () => void
 }
 
 export interface ICourseType extends INavMenu {
   description: string
   img: string
-  to?: string
+  to: string
   courseTitleId: string[]
 }
 
@@ -50,15 +32,47 @@ export interface ICourseInfo extends ICourseType {
   status: string
 }
 
-export interface ICourseProgram {
+interface IResponse {
   id: number
   customId: string
-  courseId: string[] | string
-  title: string[] | string
-  img: string[] | string
-  description: string[] | string
+}
+
+export interface IUserInfo extends IResponse {
+  lastName: string
+  name: string
+  secondName: string
+  login: string
+  password: string
+  email: string
+  city: string
+  education: string
+  aboutMe: string
+  courses: string[]
+  title: string[] 
+  role: string
+  status: string
+}
+
+export interface ICourseProgram extends IResponse {
+  courseId: string
+  title: string
+  img: string
+  description: string
   skills: string[]
   includes: string[]
   about: string
   requirements: string
+  price: string
+  level: string
+  program: string[]
+}
+
+export interface IAlert {
+  type: string
+  message: string
+}
+
+export interface IProgramDesc {
+  title: string
+  desc: string[]
 }

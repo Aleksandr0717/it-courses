@@ -8,14 +8,14 @@ const searchQuery = defineModel<string>()
     <slot name="description"></slot>
   </div>
   <VTextField 
-    label="Начните вводить название курса"
+    placeholder="Начните вводить название курса"
     prepend-inner-icon="mdi-magnify"
     variant="outlined"
     max-width="500"
     density="compact"
     hide-details
-    single-line
     clearable
     v-model.trim="searchQuery"
+    @click:clear="searchQuery = ''"
   />
 </template>

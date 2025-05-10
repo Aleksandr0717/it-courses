@@ -6,21 +6,19 @@ import { regExpForEmail } from '@/constants/RegExpForForms'
 import { useUserStore } from '@/stores/UserStore'
 import { useRouter } from 'vue-router'
 import PageLoader from '@/components/UI/PageLoader.vue'
-import PageAlert from '@/components/UI/PageAlert.vue'
 
 document.title = 'Настройки профиля'
 const router = useRouter()
 const userStore = useUserStore()
 const currentUser = computed({
   get() {
-    const editUser = Object.assign(userStore.currentUser)
+    const editUser = Object.assign(userStore.currentUser!)
     return editUser
   },
   set(value) {
     currentUser.value = value
   },
 })
-const alertMessage = computed(() => userStore.alertMessage)
 
 const educationLevels: string[] = [
   'Основное общее',
@@ -129,6 +127,9 @@ const savePasswordChange = passwordHandleSubmit(async (values: GenericObject) =>
 
 const isDisabledPersonalData = ref(true)
 const confirmDialog = ref(false)
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
+const showRepeatedPassword = ref(false)
 
 const deleteAccount = async (): Promise<void> => {
   confirmDialog.value = false
@@ -147,9 +148,6 @@ const returnBack = () => {
 
 <template>
   <div class="main d-flex justify-center">
-    <Transition name="alert">
-      <PageAlert :alert="alertMessage"/>
-    </Transition>
     <div class="back-btn">
       <VBtn variant="text" tile width="40" height="30" icon="mdi-arrow-left" @click="returnBack" />
     </div>
@@ -350,8 +348,10 @@ const returnBack = () => {
             hide-details="auto"
             max-width="510"
             density="comfortable"
-            type="password"
             clearable
+            :append-inner-icon="showCurrentPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showCurrentPassword ? 'text' : 'password'"
+            @click:append-inner="showCurrentPassword = !showCurrentPassword"
           />
         </div>
         <div class="editable-item justify-space-between">
@@ -359,13 +359,15 @@ const returnBack = () => {
           <VTextField
             v-model.trim="newPassword"
             v-bind="newPasswordAttrs"
-            :error-messages="passwordErrors.password"
+            :error-messages="passwordErrors.newPassword"
             variant="outlined"
             hide-details="auto"
             max-width="510"
             density="comfortable"
-            type="password"
             clearable
+            :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showNewPassword ? 'text' : 'password'"
+            @click:append-inner="showNewPassword = !showNewPassword"
           />
         </div>
         <div class="editable-item justify-space-between">
@@ -378,8 +380,10 @@ const returnBack = () => {
             hide-details="auto"
             max-width="510"
             density="comfortable"
-            type="password"
             clearable
+            :append-inner-icon="showRepeatedPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showRepeatedPassword ? 'text' : 'password'"
+            @click:append-inner="showRepeatedPassword = !showRepeatedPassword"
           />
         </div>
         <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
