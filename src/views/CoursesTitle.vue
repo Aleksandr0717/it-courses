@@ -2,14 +2,12 @@
 import type { ICourseInfo } from '@/interfaces';
 import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
 import { useCoursesStore } from '@/stores/CoursesStore';
-import { useDisplay } from 'vuetify'
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
 import CourseTitleHeader from '@/components/UI/CourseTitleHeader.vue';
 
 
 document.title = 'Список курсов';
-const { mobile } = useDisplay()
 const coursesStore = useCoursesStore();
 const listOfPythonCourses = ref<ICourseInfo[]>([]);
 const listOfJSCourses = ref<ICourseInfo[]>([]);
