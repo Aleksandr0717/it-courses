@@ -1,7 +1,5 @@
-//Строка подключения к ЗАПУЩЕННОМУ серверу. Смотрите порт
-export const API_BASE_URL = "http://localhost:3000/api"; // Базовый URL вашего API
+export const API_BASE_URL = "http://localhost:3000/api";
 
-// Общая функция для выполнения запросов
 export async function fetchData(url, options = {}) {
   try {
     const response = await fetch(url, {

@@ -8,12 +8,12 @@ const checkAuth = (): boolean | object => {
   const alertMessage = computed({
     get: () => userStore.alertMessage,
     set: (value) => (userStore.alertMessage = value)
-  })
+  });
   if (!localStorage.getItem("currentUser") && !sessionStorage.getItem("currentUser")) {
-    alertMessage.value = { type: 'warning', message: 'Вы не прошли авторизацию'}
+    alertMessage.value = { type: 'warning', message: 'Вы не прошли авторизацию'};
     setTimeout(() => {
-      alertMessage.value = null
-    }, 3000)
+      alertMessage.value = null;
+    }, 3000);
     return { name: 'Home' };
   }
   return true;

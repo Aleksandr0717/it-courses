@@ -4,12 +4,12 @@ import type { IUserInfo } from "@/interfaces";
 
 export function useCheckRegisteredUser() {
   const userStore = useUserStore();
-  const currentUser = computed(() => userStore.currentUser)
+  const currentUser = computed(() => userStore.currentUser);
   const unRegisteredUser = ref(true);
 
   onMounted(() => {
     const localStorageUser = localStorage.getItem("currentUser");
-    const sessionStorageUser = sessionStorage.getItem("currentUser")
+    const sessionStorageUser = sessionStorage.getItem("currentUser");
     if (!localStorageUser && !sessionStorageUser) {
       unRegisteredUser.value = true;
     }
@@ -21,7 +21,7 @@ export function useCheckRegisteredUser() {
       unRegisteredUser.value = false;
       userStore.INIT_CURRENT_USER(parseInt(JSON.parse(sessionStorageUser)));
     }
-  })
+  });
 
   watch(currentUser, (newValue: ComputedRef<IUserInfo | null>) => {
     if (newValue) unRegisteredUser.value = false;
@@ -33,4 +33,4 @@ export function useCheckRegisteredUser() {
   return {
     unRegisteredUser,
   }
-}
+};

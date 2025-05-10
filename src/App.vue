@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useUserStore } from './stores/UserStore'
-import { useCoursesStore } from './stores/CoursesStore'
-import { computed } from 'vue'
-import TheNavbar from './components/UI/TheNavbar.vue'
-import TheFooter from './components/UI/TheFooter.vue'
-import PageAlert from './components/UI/PageAlert.vue'
+import { useUserStore } from './stores/UserStore';
+import { useCoursesStore } from './stores/CoursesStore';
+import { computed } from 'vue';
+import TheNavbar from './components/UI/TheNavbar.vue';
+import TheFooter from './components/UI/TheFooter.vue';
+import PageAlert from './components/UI/PageAlert.vue';
 
-const userStore = useUserStore()
-const coursesStore = useCoursesStore()
-const alertMessageUser = computed(() => userStore.alertMessage)
-const alertMessageCourses = computed(() => coursesStore.alertMessage)
+const userStore = useUserStore();
+const coursesStore = useCoursesStore();
+const alertMessageUser = computed(() => userStore.alertMessage);
+const alertMessageCourses = computed(() => coursesStore.alertMessage);
 </script>
 
 <template>

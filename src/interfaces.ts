@@ -11,7 +11,6 @@ export interface INavMenu extends INavList {
 
 export interface INavLink extends INavList {
   to: object
-  addClass?: boolean
   action?: () => void
 }
 

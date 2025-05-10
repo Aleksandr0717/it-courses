@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/UserStore.js'
-import { ref } from 'vue'
-import type { INavList } from '@/interfaces'
-import { useForm, type GenericObject } from 'vee-validate'
-import { regExpForEmail, regExpForLogin } from '@/constants/RegExpForForms'
+import { useUserStore } from '@/stores/UserStore.js';
+import { ref } from 'vue';
+import type { INavList } from '@/interfaces';
+import { useForm, type GenericObject } from 'vee-validate';
+import { regExpForEmail, regExpForLogin } from '@/constants/RegExpForForms';
 
 const {
   handleSubmit: regHandleSubmit,
@@ -34,7 +34,7 @@ const {
       return true
     },
   },
-})
+});
 
 const {
   handleSubmit: loginHandleSubmit,
@@ -56,14 +56,14 @@ const {
       return true
     },
   },
-})
+});
 
-const [regEmail, regEmailAttrs] = regDefineField('regEmail')
-const [regUsername, regUsernameAttrs] = regDefineField('regUsername')
-const [regPassword, regPasswordAttrs] = regDefineField('regPassword')
-const [checkPersonalData, checkPersonalDataAttrs] = regDefineField('checkPersonalData')
-const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername')
-const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword')
+const [regEmail, regEmailAttrs] = regDefineField('regEmail');
+const [regUsername, regUsernameAttrs] = regDefineField('regUsername');
+const [regPassword, regPasswordAttrs] = regDefineField('regPassword');
+const [checkPersonalData, checkPersonalDataAttrs] = regDefineField('checkPersonalData');
+const [loginUsername, loginUsernameAttrs] = loginDefineField('loginUsername');
+const [loginPassword, loginPasswordAttrs] = loginDefineField('loginPassword');
 
 const onRegSubmit = regHandleSubmit(async (values: GenericObject) => {
   await userStore.INIT_CREATE_NEW_USER(values).finally(() => {
@@ -71,11 +71,11 @@ const onRegSubmit = regHandleSubmit(async (values: GenericObject) => {
     resetRegForm()
     resetLoginForm()
     profileMenu.value = false
-  })
-})
+  });
+});
 
 const onLoginSubmit = loginHandleSubmit(async (values: GenericObject) => {
-  loading.value = true
+  loading.value = true;
   await userStore.INIT_AUTORIZATION(values, checkRememberMe.value).finally(() => {
     localVisibleForm.value = false
     resetRegForm()
@@ -84,29 +84,29 @@ const onLoginSubmit = loginHandleSubmit(async (values: GenericObject) => {
     tab.value = 1
     profileMenu.value = false
     checkRememberMe.value = false
-  })
-})
+  });
+});
 
 const closeForm = (): void => {
-  localVisibleForm.value = false
-  resetRegForm()
-  resetLoginForm()
-  checkRememberMe.value = false
-}
+  localVisibleForm.value = false;
+  resetRegForm();
+  resetLoginForm();
+  checkRememberMe.value = false;
+};
 
 const tabsArray = ref<INavList[]>([
   { id: 1, title: 'Регистрация', color: 'green' },
   { id: 2, title: 'Вход', color: 'blue' },
-])
+]);
 
-const userStore = useUserStore()
-const localVisibleForm = defineModel<boolean>('localVisibleForm')
-const profileMenu = defineModel<boolean>('profileMenu')
-const checkRememberMe = ref(false)
-const tab = ref<number | null>(null)
-const loading = ref(false)
-const showRegPassword = ref(false)
-const showLoginPassword = ref(false)
+const userStore = useUserStore();
+const localVisibleForm = defineModel<boolean>('localVisibleForm');
+const profileMenu = defineModel<boolean>('profileMenu');
+const checkRememberMe = ref(false);
+const tab = ref<number | null>(null);
+const loading = ref(false);
+const showRegPassword = ref(false);
+const showLoginPassword = ref(false);
 </script>
 
 <template>
@@ -117,7 +117,7 @@ const showLoginPassword = ref(false)
   persistent
   >
     <v-card class="pa-2 form-login" width="400">
-      <div class="d-flex align-center mb-1">
+      <div class="header d-flex align-center mb-1">
         <v-tabs v-model="tab" density="compact">
           <v-tab
             v-for="item in tabsArray"
@@ -131,7 +131,7 @@ const showLoginPassword = ref(false)
           </v-tab>
         </v-tabs>
         <VSpacer />
-        <v-btn @click="closeForm" icon="mdi-close" size="26" variant="text"> </v-btn>
+        <VBtn @click="closeForm" icon="mdi-close" size="26" variant="text" />
       </div>
       <hr />
       <v-tabs-window v-model="tab">
@@ -239,7 +239,7 @@ const showLoginPassword = ref(false)
               :type="showLoginPassword ? 'text' : 'password'"
               @click:append-inner="showLoginPassword = !showLoginPassword"
             />
-            <div class="d-flex justify-space-between align-center">
+            <div class="submit d-flex justify-space-between align-center">
               <VCheckbox
                 class="ml-1"
                 label="Запомнить меня"
@@ -271,5 +271,46 @@ const showLoginPassword = ref(false)
 <style scoped lang="scss">
 .form-login {
   align-self: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  
+  @media (max-width: 425px) {
+    max-width: 100%;
+    
+    :deep(.v-input) {
+      margin-left: 0 !important;
+      .v-input__prepend {
+        display: none;
+      }
+    }
+    
+    :deep(.v-tabs) {
+      width: 100%;
+      .v-tab {
+        flex: 1;
+      }
+    }
+    
+    :deep(.v-checkbox) {
+      .v-label {
+        font-size: 14px;
+        line-height: 1.2;
+      }
+    }
+    
+    .header {
+      flex-direction: column-reverse;
+      align-items: end !important;
+    }
+    .submit {
+      flex-direction: column;
+      gap: 5px;
+      align-items: start !important;
+    }
+    .btn {
+      width: 100% !important;
+    }
+  }
 }
 </style>

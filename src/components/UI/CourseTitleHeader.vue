@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const searchQuery = defineModel<string>()
+const searchQuery = defineModel<string>();
 </script>
 
 <template>

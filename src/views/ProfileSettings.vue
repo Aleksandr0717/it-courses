@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { INavLink } from '@/interfaces'
-import { useForm, type GenericObject } from 'vee-validate'
-import { regExpForEmail } from '@/constants/RegExpForForms'
-import { useUserStore } from '@/stores/UserStore'
-import { useRouter } from 'vue-router'
-import PageLoader from '@/components/UI/PageLoader.vue'
+import { ref, computed } from 'vue';
+import type { INavLink } from '@/interfaces';
+import { useForm, type GenericObject } from 'vee-validate';
+import { regExpForEmail } from '@/constants/RegExpForForms';
+import { useUserStore } from '@/stores/UserStore';
+import { useRouter } from 'vue-router';
+import PageLoader from '@/components/UI/PageLoader.vue';
 
-document.title = 'Настройки профиля'
-const router = useRouter()
-const userStore = useUserStore()
+document.title = 'Настройки профиля';
+const router = useRouter();
+const userStore = useUserStore();
 const currentUser = computed({
   get() {
-    const editUser = Object.assign(userStore.currentUser!)
-    return editUser
+    const editUser = Object.assign(userStore.currentUser!);
+    return editUser;
   },
   set(value) {
-    currentUser.value = value
+    currentUser.value = value;
   },
-})
+});
 
 const educationLevels: string[] = [
   'Основное общее',
@@ -27,13 +27,12 @@ const educationLevels: string[] = [
   'Бакалавриат',
   'Специалитет',
   'Магистратура',
-]
+];
 const navLinks: INavLink[] = [
   {
     id: 1,
     title: 'Личная информация',
     to: { name: 'Settings', params: { userData: 'personal' } },
-    addClass: false,
     action: () => {
       emailResetForm()
       passwordResetForm()
@@ -43,7 +42,6 @@ const navLinks: INavLink[] = [
     id: 2,
     title: 'Изменить почту',
     to: { name: 'Settings', params: { userData: 'email' } },
-    addClass: true,
     action: () => {
       passwordResetForm()
       isDisabledPersonalData.value = true
@@ -53,13 +51,12 @@ const navLinks: INavLink[] = [
     id: 3,
     title: 'Изменить пароль',
     to: { name: 'Settings', params: { userData: 'password' } },
-    addClass: true,
     action: () => {
       emailResetForm()
       isDisabledPersonalData.value = true
     },
   },
-]
+];
 
 const {
   handleSubmit: emailHandleSubmit,
@@ -70,11 +67,11 @@ const {
   validationSchema: {
     newEmail(value: string): string | boolean {
       if (!regExpForEmail.test(value)) return 'Введите корректный e-mail'
-      else if (value === currentUser.value.email) return 'Новый e-mail совпадает с текущим'
+      else if (value === currentUser.value?.email) return 'Новый e-mail совпадает с текущим'
       return true
     },
   },
-})
+});
 
 const {
   handleSubmit: passwordHandleSubmit,
@@ -85,13 +82,13 @@ const {
   validationSchema: {
     currentPassword(value: string): string | boolean {
       if (!value?.length) return 'Введите текущий пароль'
-      else if (value !== currentUser.value.password) return 'Неверный текущий пароль'
+      else if (value !== currentUser.value?.password) return 'Неверный текущий пароль'
       return true
     },
     newPassword(value: string): string | boolean {
       if (!value?.length && currentPassword.value) return 'Введите новый пароль'
       else if (value?.length < 6) return 'Пароль должен содержать не менее 6 символов'
-      else if (value === currentUser.value.password) return 'Новый пароль совпадает с текущим'
+      else if (value === currentUser.value?.password) return 'Новый пароль совпадает с текущим'
       return true
     },
     repeatedPassword(value: string): string | boolean {
@@ -99,51 +96,51 @@ const {
       return true
     },
   },
-})
+});
 
-const [newEmail, newEmailAttrs] = emailDefineField('newEmail')
-const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword')
-const [newPassword, newPasswordAttrs] = passwordDefineField('newPassword')
-const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword')
+const [newEmail, newEmailAttrs] = emailDefineField('newEmail');
+const [currentPassword, currentPasswordAttrs] = passwordDefineField('currentPassword');
+const [newPassword, newPasswordAttrs] = passwordDefineField('newPassword');
+const [repeatedPassword, repeatedPasswordAttrs] = passwordDefineField('repeatedPassword');
 
 const savePersonalDataChange = async (): Promise<void> => {
   await userStore.INIT_UPDATE_USER_DATA(currentUser.value).finally(() => {
-    isDisabledPersonalData.value = true
-  })
-}
+    isDisabledPersonalData.value = true;
+  });
+};
 
 const saveEmailChange = emailHandleSubmit(async (value: GenericObject) => {
-  currentUser.value.email = value.newEmail
-  emailResetForm()
-  await userStore.INIT_UPDATE_USER_DATA(currentUser.value)
-})
+  currentUser.value.email = value.newEmail;
+  emailResetForm();
+  await userStore.INIT_UPDATE_USER_DATA(currentUser.value);
+});
 
 const savePasswordChange = passwordHandleSubmit(async (values: GenericObject) => {
-  currentUser.value.password = values.newPassword
+  currentUser.value.password = values.newPassword;
   await userStore.INIT_UPDATE_USER_DATA(currentUser.value).finally(() =>{
-    passwordResetForm()
-  })
-})
+    passwordResetForm();
+  });
+});
 
-const isDisabledPersonalData = ref(true)
-const confirmDialog = ref(false)
-const showCurrentPassword = ref(false)
-const showNewPassword = ref(false)
-const showRepeatedPassword = ref(false)
+const isDisabledPersonalData = ref(true);
+const confirmDialog = ref(false);
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showRepeatedPassword = ref(false);
 
 const deleteAccount = async (): Promise<void> => {
-  confirmDialog.value = false
-  await userStore.INIT_DELETE_USER(currentUser.value)
-  userStore.INIT_LOGOUT()
-  router.push({ name: 'Home' })
-}
+  confirmDialog.value = false;
+  await userStore.INIT_DELETE_USER(currentUser.value);
+  userStore.INIT_LOGOUT();
+  router.push({ name: 'Home' });
+};
 
 const returnBack = () => {
-  router.back()
-  emailResetForm()
-  passwordResetForm()
-  isDisabledPersonalData.value = true
-}
+  router.back();
+  emailResetForm();
+  passwordResetForm();
+  isDisabledPersonalData.value = true;
+};
 </script>
 
 <template>
@@ -159,7 +156,7 @@ const returnBack = () => {
       <PageLoader v-if="userStore.isLoading" :height="400" />
       <div v-else>
         <div class="editable-item">
-          <label style="margin-right: 58px" for="fam">Фамилия*:</label>
+          <label style="margin-right: 58px" for="fam">Фамилия<p style="color: red; display: inline;">*</p>:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.lastName }}</p>
           <VTextField
             v-else
@@ -172,7 +169,7 @@ const returnBack = () => {
           />
         </div>
         <div class="editable-item">
-          <label style="margin-right: 96px" for="name">Имя*:</label>
+          <label style="margin-right: 96px" for="name">Имя<p style="color: red; display: inline;">*</p>:</label>
           <p v-if="isDisabledPersonalData">{{ currentUser.name }}</p>
           <VTextField
             v-else
@@ -241,8 +238,8 @@ const returnBack = () => {
             clearable
           />
         </div>
-        <p style="padding-left: 50px; margin-top: 20px; font-size: 13px">
-          * - Рекомендуемые для заполнения поля
+        <p class="recommended" style="padding-left: 50px; margin-top: 20px; font-size: 13px">
+          <p style="color: red; display: inline;">*</p> - Рекомендуемые для заполнения поля
         </p>
         <v-btn
           v-if="isDisabledPersonalData"
@@ -303,7 +300,7 @@ const returnBack = () => {
         </v-card>
       </v-dialog>
     </div>
-    <div v-else-if="$route.params.userData === 'email'" class="editable-items mt-7">
+    <div v-else-if="$route.params.userData === 'email'" class="editable-items mt-lg-7">
       <div class="header text-center d-flex flex-column">
         <h3>Изменение почты</h3>
         <VDivider opacity=".3" />
@@ -332,13 +329,13 @@ const returnBack = () => {
         </v-btn>
       </v-form>
     </div>
-    <div v-else class="editable-items mt-7">
+    <div v-else class="editable-items mt-lg-7">
       <div class="header text-center d-flex flex-column">
         <h3>Изменение пароля</h3>
         <VDivider opacity=".3" />
       </div>
       <v-form @submit.prevent="savePasswordChange">
-        <div class="editable-item justify-space-between">
+        <div class="editable-item justify-space-between ga-sm-5">
           <label for="current-password">Текущий пароль:</label>
           <VTextField
             v-model.trim="currentPassword"
@@ -354,7 +351,7 @@ const returnBack = () => {
             @click:append-inner="showCurrentPassword = !showCurrentPassword"
           />
         </div>
-        <div class="editable-item justify-space-between">
+        <div class="editable-item justify-space-between ga-sm-9">
           <label for="new-password">Новый пароль:</label>
           <VTextField
             v-model.trim="newPassword"
@@ -370,7 +367,7 @@ const returnBack = () => {
             @click:append-inner="showNewPassword = !showNewPassword"
           />
         </div>
-        <div class="editable-item justify-space-between">
+        <div class="editable-item justify-space-between ga-sm-2">
           <label for="repeated-password">Повторите пароль:</label>
           <VTextField
             v-model.trim="repeatedPassword"
@@ -391,8 +388,8 @@ const returnBack = () => {
         </v-btn>
       </v-form>
     </div>
-    <div class="nav-links mt-7 d-flex flex-column">
-      <div :class="['d-inline', { 'mt-2': link.addClass }]" v-for="link in navLinks" :key="link.id">
+    <div class="nav-links mt-7 d-flex flex-column ga-2">
+      <div class="d-inline" v-for="link in navLinks" :key="link.id">
         <router-link
           class="nav-link"
           active-class="nav-link-active"
@@ -407,44 +404,98 @@ const returnBack = () => {
 </template>
 
 <style scoped lang="scss">
-.back-btn {
-  margin-top: 27px;
-  width: 40px;
-  height: 30px;
-  background-color: rgb(233, 233, 233);
-}
-.editable-items {
-  width: 762px;
-  .editable-item {
-    display: flex;
-    margin-top: 25px;
+.main {
+  @media (max-width: 768px) {
+    padding-bottom: 30px;
+    flex-direction: column;
     align-items: center;
-    padding-inline: 50px;
-    justify-content: start;
   }
-  .btn {
-    margin-left: 50px;
+  .back-btn {
+    margin-top: 27px;
+    width: 40px;
+    height: 30px;
+    background-color: rgb(233, 233, 233);
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
-}
-.nav-links {
-  width: 285px;
-  padding: {
-    inline: 50px;
-    top: 20px;
+  
+  .editable-items {
+    width: 762px;
+    .editable-item {
+      display: flex;
+      margin-top: 25px;
+      align-items: center;
+      padding-inline: 50px;
+      justify-content: start;
+    }
+    .btn {
+      margin-left: 50px;
+    }
+  
+    @media (max-width: 768px) {
+      width: 100%;
+      max-width: 762px;
+      margin-top: 0 !important;
+    }
+  
+    @media (max-width: 768px) {
+      .editable-item {
+        flex-direction: column;
+        align-items: start;
+        padding-inline: 20px;
+        gap: 10px !important;
+        
+        :deep(.v-input) {
+          width: 100%;
+        }
+      }
+      .btn {
+        margin-left: 20px;
+        width: calc(100% - 40px) !important;
+      }
+      .recommended {
+        padding-left: 20px !important;
+      }
+    }
   }
-  .nav-link {
-    color: green;
-    text-decoration: none;
-    &:hover {
+  
+  .nav-links {
+    width: 285px;
+    padding: {
+      inline: 50px;
+      top: 20px;
+    }
+    @media (max-width: 768px) {
+      gap: 0 !important;
+      padding: {
+        top: 10px;
+        inline: 20px;
+      }
+      order: -1;
+      width: 100%;
+      flex-direction: row !important;
+      justify-content: space-evenly;
+      margin-top: 0 !important;
+    }
+    @media (max-width: 425px) {
+      flex-direction: column !important;
+    }
+  
+    .nav-link {
+      color: green;
+      text-decoration: none;
+      &:hover {
+        border-bottom: 1px solid;
+      }
+      &:active {
+        opacity: 0.7;
+        border: 0;
+      }
+    }
+    .nav-link-active {
       border-bottom: 1px solid;
     }
-    &:active {
-      opacity: 0.7;
-      border: 0;
-    }
-  }
-  .nav-link-active {
-    border-bottom: 1px solid;
   }
 }
 </style>

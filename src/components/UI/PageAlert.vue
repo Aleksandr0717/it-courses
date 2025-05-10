@@ -3,7 +3,7 @@ import type { IAlert } from '@/interfaces';
 
 const props = defineProps<{
   alertInfo: IAlert
-}>()
+}>();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const props = defineProps<{
     <v-alert
       :icon="'$' + props.alertInfo?.type"
       border
-      width="350"
+      :width="$vuetify.display.mobile ? 300 : 350"
       :border-color="props.alertInfo?.type"
       elevation="5"
     >

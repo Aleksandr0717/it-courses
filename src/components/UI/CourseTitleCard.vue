@@ -1,53 +1,52 @@
 <script setup lang="ts">
-import type { ICourseInfo } from '@/interfaces'
-import { computed, ref, useTemplateRef } from 'vue'
-import { useUserStore } from '@/stores/UserStore'
-import { useCoursesStore } from '@/stores/CoursesStore'
+import type { ICourseInfo } from '@/interfaces';
+import { computed, ref, useTemplateRef } from 'vue';
+import { useUserStore } from '@/stores/UserStore';
+import { useCoursesStore } from '@/stores/CoursesStore';
 
-const coursesStore = useCoursesStore()
-const userStore = useUserStore()
-const currentUser = computed(() => userStore.currentUser)
+const coursesStore = useCoursesStore();
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.currentUser);
 const alertMessage = computed({
   get: () => coursesStore.alertMessage,
   set: (value) => coursesStore.alertMessage = value
-})
+});
 
 const props = defineProps<{
   course: ICourseInfo
-}>()
-const emit = defineEmits(['updateInfo', 'deleteCourse', 'editCard'])
+}>();
+const emit = defineEmits(['updateInfo', 'deleteCourse', 'editCard']);
 
-const isEditedCourseInfo = ref(false)
-const confirmDialog = ref(false)
-const form = useTemplateRef<HTMLFormElement>('form')
+const isEditedCourseInfo = ref(false);
+const confirmDialog = ref(false);
+const form = useTemplateRef<HTMLFormElement>('form');
 
 const updateCard = async () => {
-  const { valid } = await form.value?.validate()
+  const { valid } = await form.value?.validate();
   if (valid) {
-    isEditedCourseInfo.value = false
-    emit('updateInfo', props.course.id)
-    emit('editCard', false)
+    isEditedCourseInfo.value = false;
+    emit('updateInfo', props.course.id);
+    emit('editCard', false);
   }
-}
+};
 
 const deleteCard = () => {
-  confirmDialog.value = false
-  emit('deleteCourse', props.course.id)
-  emit('editCard', false)
-}
+  confirmDialog.value = false;
+  emit('deleteCourse', props.course.id);
+  emit('editCard', false);
+};
 
 const editCard = () => {
-  isEditedCourseInfo.value = true
-  emit('editCard', true)
-}
+  isEditedCourseInfo.value = true;
+  emit('editCard', true);
+};
 
 const closeEditor = () => {
-  alertMessage.value = { type: 'warning', message: 'Изменения не сохранены в базе' }
-  setTimeout(() => alertMessage.value = null, 3000)
-  isEditedCourseInfo.value = false
-  emit('editCard', false)
-}
-
+  alertMessage.value = { type: 'warning', message: 'Изменения не сохранены в базе' };
+  setTimeout(() => alertMessage.value = null, 3000);
+  isEditedCourseInfo.value = false;
+  emit('editCard', false);
+};
 </script>
 
 <template>
@@ -88,6 +87,7 @@ const closeEditor = () => {
                 rounded="xl"
                 size="30"
                 color="blue"
+                class="btn"
               >
                 <v-icon size="18">mdi-pen</v-icon>
               </v-btn>
@@ -98,6 +98,7 @@ const closeEditor = () => {
                 rounded="xl"
                 size="30"
                 color="green"
+                class="btn"
               >
                 <v-icon size="18">mdi-check</v-icon>
               </v-btn>
@@ -108,6 +109,7 @@ const closeEditor = () => {
                 rounded="xl"
                 size="30"
                 color="red"
+                class="btn"
               >
                 <v-icon size="18">mdi-delete</v-icon>
               </v-btn>
@@ -118,6 +120,7 @@ const closeEditor = () => {
                 rounded="xl"
                 size="30"
                 color="red"
+                class="btn"
               >
                 <v-icon size="18">mdi-close</v-icon>
               </v-btn>
@@ -193,7 +196,7 @@ const closeEditor = () => {
             max-width="300"
             density="compact"
             hide-details="auto"
-            placeholder="Выберите уровень образования"
+            placeholder="Выберите уровень сложности"
             :items="['Начальный уровень', 'Средний уровень', 'Продвинутый уровень']"
             variant="outlined"
             open-on-clear
@@ -223,6 +226,55 @@ const closeEditor = () => {
     }
     h4:hover {
       text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 425px) {
+  .desc-card {
+    flex-direction: column;
+    
+    img {
+      align-self: center;
+    }
+  }
+  
+  .desc-card-text {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .card {
+    padding: 10px;
+    .btn {
+      display: none;
+    }
+  }
+  
+  .desc-card-text {
+    h4 {
+      font-size: 18px;
+    }
+    
+    p {
+      font-size: 13px;
+    }
+  }
+  
+  .v-chip {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .desc-card-text {
+    h4 {
+      font-size: 16px;
+    }
+    
+    p {
+      font-size: 12px;
     }
   }
 }

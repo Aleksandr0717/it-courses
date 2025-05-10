@@ -1,102 +1,101 @@
 <script setup lang="ts">
-import type { ICourseInfo } from '@/interfaces'
-import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import type { ICourseInfo } from '@/interfaces';
+import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
 import { useCoursesStore } from '@/stores/CoursesStore';
 import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
 import CourseTitleHeader from '@/components/UI/CourseTitleHeader.vue';
 
-document.title = 'Список курсов'
+document.title = 'Список курсов';
 const coursesStore = useCoursesStore();
-const listOfPythonCourses = ref<ICourseInfo[]>([])
-const listOfJSCourses = ref<ICourseInfo[]>([])
-const listOfCsharpCourses = ref<ICourseInfo[]>([])
-const isLoading = ref(false)
+const listOfPythonCourses = ref<ICourseInfo[]>([]);
+const listOfJSCourses = ref<ICourseInfo[]>([]);
+const listOfCsharpCourses = ref<ICourseInfo[]>([]);
+const isLoading = ref(false);
 
 onMounted(async () => {
-  isLoading.value = true
-  listOfPythonCourses.value = await coursesStore.GET_COURSES_TITLE('python')
-  listOfJSCourses.value = await coursesStore.GET_COURSES_TITLE('js')
-  listOfCsharpCourses.value = await coursesStore.GET_COURSES_TITLE('csharp')
-  isLoading.value = false
+  isLoading.value = true;
+  listOfPythonCourses.value = await coursesStore.GET_COURSES_TITLE('python');
+  listOfJSCourses.value = await coursesStore.GET_COURSES_TITLE('js');
+  listOfCsharpCourses.value = await coursesStore.GET_COURSES_TITLE('csharp');
+  isLoading.value = false;
 })
 
-const selectedDifficultyLevel = ref<string[]>(['Все'])
-const isFreeCourses = ref(false)
-const searchQueryforPython = ref('')
-const searchQueryforJS = ref('')
-const searchQueryforCsharp = ref('')
-const isEditedCourseInfo = ref(false)
+const selectedDifficultyLevel = ref<string[]>(['Все']);
+const isFreeCourses = ref(false);
+const searchQueryforPython = ref('');
+const searchQueryforJS = ref('');
+const searchQueryforCsharp = ref('');
+const isEditedCourseInfo = ref(false);
 
 const filterByDifficultyLevel = (list: Ref<ICourseInfo[]>): ICourseInfo[] => {
   if (selectedDifficultyLevel.value.includes('Все')) {
-    return list.value
+    return list.value;
   } else {
-    return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level))
+    return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level));
   }
-}
+};
 const filterByFree = (list: ComputedRef<ICourseInfo[]>): ICourseInfo[] => {
   if (isFreeCourses.value) {
-    return list.value.filter((course: ICourseInfo) => course.price === 'Бесплатно')
-  } else return list.value
-}
+    return list.value.filter((course: ICourseInfo) => course.price === 'Бесплатно');
+  } else return list.value;
+};
 const sortByTitle = (list: ComputedRef<ICourseInfo[]>, searchQuery: Ref<string>): ICourseInfo[] => {
-  return list.value.filter((course: ICourseInfo) => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
-}
+  return list.value.filter((course: ICourseInfo) => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+};
 
 const updateCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>): Promise<void> => {
-  const course = list.value.find((course: ICourseInfo) => course.id === id)
-  await coursesStore.UPDATE_COURSE_TITLE(course)
-  isEditedCourseInfo.value = false
-}
+  const course = list.value.find((course: ICourseInfo) => course.id === id);
+  await coursesStore.UPDATE_COURSE_TITLE(course);
+  isEditedCourseInfo.value = false;
+};
 
 const deleteCourseTitleCard = async (id: number, list: Ref<ICourseInfo[]>): Promise<void> => {
-  const course = list.value.find((course: ICourseInfo) => course.id === id)
-  await coursesStore.DELETE_COURSE_TITLE(course)
-  list.value = list.value.filter((course: ICourseInfo) => course.id !== id)
-}
+  const course = list.value.find((course: ICourseInfo) => course.id === id);
+  await coursesStore.DELETE_COURSE_TITLE(course);
+  list.value = list.value.filter((course: ICourseInfo) => course.id !== id);
+};
 
-const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses))
-const filteredByDifficultJSCoursesList = computed(() => filterByDifficultyLevel(listOfJSCourses))
-const filteredByDifficultCsharpCoursesList = computed(() =>filterByDifficultyLevel(listOfCsharpCourses))
+const filteredByDifficultPythonCoursesList = computed(() => filterByDifficultyLevel(listOfPythonCourses));
+const filteredByDifficultJSCoursesList = computed(() => filterByDifficultyLevel(listOfJSCourses));
+const filteredByDifficultCsharpCoursesList = computed(() =>filterByDifficultyLevel(listOfCsharpCourses));
 
-const filteredByFreePythonCoursesList = computed(() => filterByFree(filteredByDifficultPythonCoursesList))
-const filteredByFreeJSCoursesList = computed(() => filterByFree(filteredByDifficultJSCoursesList))
-const filteredByFreeCsharpCoursesList = computed(() => filterByFree(filteredByDifficultCsharpCoursesList))
+const filteredByFreePythonCoursesList = computed(() => filterByFree(filteredByDifficultPythonCoursesList));
+const filteredByFreeJSCoursesList = computed(() => filterByFree(filteredByDifficultJSCoursesList));
+const filteredByFreeCsharpCoursesList = computed(() => filterByFree(filteredByDifficultCsharpCoursesList));
 
-const sortedPythonCoursesList = computed(() => sortByTitle(filteredByFreePythonCoursesList, searchQueryforPython))
-const sortedJSCoursesList = computed(() => sortByTitle(filteredByFreeJSCoursesList, searchQueryforJS))
-const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpCoursesList, searchQueryforCsharp))
+const sortedPythonCoursesList = computed(() => sortByTitle(filteredByFreePythonCoursesList, searchQueryforPython));
+const sortedJSCoursesList = computed(() => sortByTitle(filteredByFreeJSCoursesList, searchQueryforJS));
+const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpCoursesList, searchQueryforCsharp));
 
 const updatePythonTitleCard = async (id: number): Promise<void> => {
-  await updateCourseTitleCard(id, listOfPythonCourses)
-}
+  await updateCourseTitleCard(id, listOfPythonCourses);
+};
 
 const updateJSTitleCard = async (id: number): Promise<void> => {
-  await updateCourseTitleCard(id, listOfJSCourses)
-}
+  await updateCourseTitleCard(id, listOfJSCourses);
+};
 
 const updateCsharpTitleCard = async (id: number): Promise<void> => {
-  await updateCourseTitleCard(id, listOfCsharpCourses)
-}
+  await updateCourseTitleCard(id, listOfCsharpCourses);
+};
 
 const deletePythonTitleCard = async (id: number): Promise<void> => {
-  await deleteCourseTitleCard(id, listOfPythonCourses)
-}
+  await deleteCourseTitleCard(id, listOfPythonCourses);
+};
 
 const deleteJSTitleCard = async (id: number): Promise<void> => {
-  await deleteCourseTitleCard(id, listOfJSCourses)
-}
+  await deleteCourseTitleCard(id, listOfJSCourses);
+};
 
 const deleteCsharpTitleCard = async (id: number): Promise<void> => {
-  await deleteCourseTitleCard(id, listOfCsharpCourses)
-}
+  await deleteCourseTitleCard(id, listOfCsharpCourses);
+};
 
 const clickOnCource = (course: ICourseInfo): void =>{
   if(isEditedCourseInfo.value) return;
   course.action();
-}
-
+};
 </script>
 
 <template>
@@ -181,7 +180,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-3 mt-5">
+      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
@@ -213,7 +212,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-3 mt-5">
+      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
@@ -245,7 +244,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-3 mt-5">
+      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
@@ -276,22 +275,56 @@ const clickOnCource = (course: ICourseInfo): void =>{
     border-right: 1px solid rgb(238, 238, 238);
     width: 20%;
     height: auto;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid rgb(238, 238, 238);
+    }
+
     &-fixed {
       width: 20%;
       position: fixed;
       p {
         font-size: 14px;
       }
+
+      @media (max-width: 1024px) {
+        width: 100%;
+        position: relative;
+      }
     }
   }
+
   &-content {
-    width:950px;
+    width: 950px;
     padding-left: 60px;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+      padding-left: 30px;
+    }
+
+    @media (max-width: 768px) {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    @media (max-width: 576px) {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
   }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
+
   .courses-list-enter-active,
   .courses-list-leave-active {
     transition: all 0.4s ease;
   }
+
   .courses-list-enter-from,
   .courses-list-leave-to {
     opacity: 0;
