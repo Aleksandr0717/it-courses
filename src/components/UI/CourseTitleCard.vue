@@ -50,7 +50,7 @@ const closeEditor = () => {
 </script>
 
 <template>
-  <div class="card">
+  <div :class="{'card': !isEditedCourseInfo}">
     <v-form ref="form" class="desc-card d-flex ga-6 mb-3">
       <VTextarea
         v-if="isEditedCourseInfo"

@@ -238,9 +238,10 @@ const returnBack = () => {
             clearable
           />
         </div>
-        <p class="recommended" style="padding-left: 50px; margin-top: 20px; font-size: 13px">
-          <p style="color: red; display: inline;">*</p> - Рекомендуемые для заполнения поля
-        </p>
+        <div class="recommended">
+          <p style="color: red">*</p> 
+          <p> - Рекомендуемые для заполнения поля</p>
+        </div>
         <v-btn
           v-if="isDisabledPersonalData"
           class="btn text-none mt-5"
@@ -431,6 +432,14 @@ const returnBack = () => {
     }
     .btn {
       margin-left: 50px;
+    }
+    .recommended {
+      padding-left: 50px;
+      margin-top: 20px;
+      font-size: 13px;
+      p {
+        display: inline;
+      }
     }
   
     @media (max-width: 768px) {

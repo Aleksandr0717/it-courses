@@ -28,4 +28,13 @@ const alertMessageCourses = computed(() => coursesStore.alertMessage);
   </v-app>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.alert-enter-active,
+.alert-leave-active {
+  transition: all 0.3s ease;
+}
+.alert-enter-from,
+.alert-leave-to {
+  transform: translateX(350px);
+}
+</style>
