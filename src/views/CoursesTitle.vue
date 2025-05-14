@@ -6,6 +6,7 @@ import CourseTitleCard from '@/components/UI/CourseTitleCard.vue'
 import PageLoader from '@/components/UI/PageLoader.vue';
 import CourseTitleHeader from '@/components/UI/CourseTitleHeader.vue';
 
+
 document.title = 'Список курсов';
 const coursesStore = useCoursesStore();
 const listOfPythonCourses = ref<ICourseInfo[]>([]);
@@ -27,6 +28,7 @@ const searchQueryforPython = ref('');
 const searchQueryforJS = ref('');
 const searchQueryforCsharp = ref('');
 const isEditedCourseInfo = ref(false);
+const visibleFilter = ref(false)
 
 const filterByDifficultyLevel = (list: Ref<ICourseInfo[]>): ICourseInfo[] => {
   if (selectedDifficultyLevel.value.includes('Все')) {
@@ -104,9 +106,18 @@ const clickOnCource = (course: ICourseInfo): void =>{
       <div class="main-filter-fixed pt-4 d-flex flex-column">
         <div class="filter-header d-flex justify-center mb-3">
           <h3>Фильтры</h3>
+          <v-btn
+            v-if="$vuetify.display.mobile"
+            variant="flat"
+            size="26"
+            tile
+            :icon="visibleFilter ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            @click="visibleFilter = !visibleFilter"
+          >
+          </v-btn>
         </div>
-        <VDivider />
-        <div class="difficulty-level ml-4 mt-3 mb-2">
+        <VDivider v-if="visibleFilter || !$vuetify.display.mobile"/>
+        <div class="difficulty-level ml-4 mt-3 mb-2" v-if="visibleFilter || !$vuetify.display.mobile">
           <p>Уровень сложности</p>
           <div class="ml-6">
             <v-checkbox
@@ -155,8 +166,8 @@ const clickOnCource = (course: ICourseInfo): void =>{
             </v-checkbox>
           </div>
         </div>
-        <VDivider />
-        <div class="price ml-4 mt-3">
+        <VDivider v-if="visibleFilter || !$vuetify.display.mobile" />
+        <div class="price ml-4 mt-3" v-if="visibleFilter || !$vuetify.display.mobile">
           <p>Цена</p>
           <div class="ml-6">
             <v-checkbox v-model="isFreeCourses" hide-details color="green" density="compact">
@@ -166,7 +177,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             </v-checkbox>
           </div>
         </div>
-        <VDivider />
+        <VDivider v-if="visibleFilter || !$vuetify.display.mobile" />
       </div>
     </div>
     <div v-if="$route.params.lang === 'python'" class="main-content mt-4 mb-3">
@@ -180,7 +191,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
+      <div class="content d-flex flex-column ga-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
@@ -212,7 +223,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
+      <div class="content d-flex flex-column ga-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
@@ -244,7 +255,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           </p>
         </template>
       </course-title-header>
-      <div class="content d-flex flex-column ga-lg-3 ga-md-3 ga-sm-3 mt-5">
+      <div class="content d-flex flex-column ga-3 mt-5">
         <VDivider />
         <PageLoader v-if="isLoading" :height="450" />
         <div class="d-flex justify-center" v-else-if="!selectedDifficultyLevel.length">
