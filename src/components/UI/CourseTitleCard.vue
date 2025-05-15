@@ -3,6 +3,7 @@ import type { ICourseInfo } from '@/interfaces';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useUserStore } from '@/stores/UserStore';
 import { useCoursesStore } from '@/stores/CoursesStore';
+import { courseLevel, findTitle } from '@/enums';
 
 const coursesStore = useCoursesStore();
 const userStore = useUserStore();
@@ -17,6 +18,13 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['updateInfo', 'deleteCourse', 'editCard']);
 
+const duplicatedCourseData = computed({
+  get() {
+    return Object.assign({}, props.course);
+  },
+  set() {
+  }
+});
 const isEditedCourseInfo = ref(false);
 const confirmDialog = ref(false);
 const form = useTemplateRef<HTMLFormElement>('form');
@@ -25,7 +33,7 @@ const updateCard = async () => {
   const { valid } = await form.value?.validate();
   if (valid) {
     isEditedCourseInfo.value = false;
-    emit('updateInfo', props.course.id);
+    emit('updateInfo', duplicatedCourseData.value);
     emit('editCard', false);
   }
 };
@@ -47,6 +55,10 @@ const closeEditor = () => {
   isEditedCourseInfo.value = false;
   emit('editCard', false);
 };
+
+const findColor = (id: number) => {
+  return courseLevel.find((item) => item.id === id)?.color;
+};
 </script>
 
 <template>
@@ -54,7 +66,7 @@ const closeEditor = () => {
     <v-form ref="form" class="desc-card d-flex ga-6 mb-3">
       <VTextarea
         v-if="isEditedCourseInfo"
-        v-model.trim="course.img"
+        v-model.trim="duplicatedCourseData.img"
         variant="outlined"
         hide-details="auto"
         width="100"
@@ -69,7 +81,7 @@ const closeEditor = () => {
           <div class="d-flex align-center">
             <VTextField
               v-if="isEditedCourseInfo"
-              v-model.trim="course.title"
+              v-model.trim="duplicatedCourseData.title"
               variant="outlined"
               hide-details="auto"
               width="500"
@@ -153,7 +165,7 @@ const closeEditor = () => {
           <VTextField
             class="mt-2"
             v-if="isEditedCourseInfo"
-            v-model.trim="course.authors"
+            v-model.trim="duplicatedCourseData.authors"
             variant="outlined"
             hide-details="auto"
             width="500"
@@ -165,7 +177,7 @@ const closeEditor = () => {
         </div>
         <VTextarea
           v-if="isEditedCourseInfo"
-          v-model.trim="course.description"
+          v-model.trim="duplicatedCourseData.description"
           variant="outlined"
           hide-details="auto"
           width="756"
@@ -179,7 +191,7 @@ const closeEditor = () => {
         <div class="d-flex ga-3">
           <VTextField
             v-if="isEditedCourseInfo"
-            v-model.trim="course.price"
+            v-model.trim="duplicatedCourseData.price"
             variant="outlined"
             hide-details="auto"
             max-width="150"
@@ -192,23 +204,23 @@ const closeEditor = () => {
           </v-chip>
           <VAutocomplete
             v-if="isEditedCourseInfo"
-            v-model.trim="course.level"
+            v-model.trim="duplicatedCourseData.level"
             max-width="300"
             density="compact"
             hide-details="auto"
             placeholder="Выберите уровень сложности"
-            :items="['Начальный уровень', 'Средний уровень', 'Продвинутый уровень']"
+            :items="[1, 2, 3]"
             variant="outlined"
             open-on-clear
             :rules="[(v) => !!v || 'Поле обязательно для заполнения']"
           />
           <v-chip
             v-else
-            :color="course.level === 'Начальный уровень' ? 'blue' : course.level === 'Средний уровень' ? 'yellow' : 'orange'"
+            :color="findColor(course.level)"
             variant="flat"
             size="small"
           >
-            {{ course.level }}
+            {{ findTitle(course.level) }}
           </v-chip>
         </div>
       </div>
@@ -233,12 +245,12 @@ const closeEditor = () => {
 @media (max-width: 425px) {
   .desc-card {
     flex-direction: column;
-    
+
     img {
       align-self: center;
     }
   }
-  
+
   .desc-card-text {
     width: 100%;
   }
@@ -251,17 +263,17 @@ const closeEditor = () => {
       display: none;
     }
   }
-  
+
   .desc-card-text {
     h4 {
       font-size: 18px;
     }
-    
+
     p {
       font-size: 13px;
     }
   }
-  
+
   .v-chip {
     font-size: 12px;
   }
@@ -272,7 +284,7 @@ const closeEditor = () => {
     h4 {
       font-size: 16px;
     }
-    
+
     p {
       font-size: 12px;
     }

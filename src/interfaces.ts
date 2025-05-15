@@ -6,7 +6,7 @@ export interface INavList {
 
 export interface INavMenu extends INavList {
   icon?: string
-  action: () => void 
+  action: () => void
 }
 
 export interface INavLink extends INavList {
@@ -24,7 +24,7 @@ export interface ICourseType extends INavMenu {
 export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
-  level: string
+  level: number
   courseTypeTitle: string[]
   customId: string
   courseType: string[]
@@ -47,7 +47,7 @@ export interface IUserInfo extends IResponse {
   education: string
   aboutMe: string
   courses: string[]
-  title: string[] 
+  title: string[]
   role: string
   status: string
 }
@@ -62,7 +62,7 @@ export interface ICourseProgram extends IResponse {
   about: string
   requirements: string
   price: string
-  level: string
+  level: number
   program: string[]
 }
 

@@ -4,6 +4,7 @@ import { useCoursesStore } from '@/stores/CoursesStore';
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
 import type { ICourseProgram, IProgramDesc } from '@/interfaces';
+import { findTitle } from '@/enums';
 import PageLoader from '@/components/UI/PageLoader.vue';
 
 const courseProgram = ref<ICourseProgram | null>(null);
@@ -58,7 +59,7 @@ onMounted(async () => {
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>О курсе:</h3>
-            <p v-if="typeof courseProgram?.about === 'object'" 
+            <p v-if="typeof courseProgram?.about === 'object'"
               v-for="(str, i) in courseProgram.about" :key="i"
             >
               {{ str }}
@@ -67,7 +68,7 @@ onMounted(async () => {
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>Начальные требования:</h3>
-            <p v-if="typeof courseProgram?.requirements === 'object'" 
+            <p v-if="typeof courseProgram?.requirements === 'object'"
               v-for="(str, i) in courseProgram.requirements" :key="i"
             >
               {{ str }}
@@ -94,7 +95,7 @@ onMounted(async () => {
         <div class="content-center-general-info d-flex flex-column pr-4">
           <div class="mb-3">
             <h4>{{ courseProgram?.price }}</h4>
-            <h4>{{ courseProgram?.level }}</h4>
+            <h4>{{ findTitle(courseProgram?.level) }}</h4>
           </div>
           <div class="quantity pa-3 mb-5">
             <h4>В курс входят:</h4>
@@ -197,7 +198,7 @@ $bg-color: rgb(233, 233, 233);
           ul {
             list-style: none;
             li::before {
-              content: "\203A"; 
+              content: "\203A";
               margin-right: 10px;
               color: black;
             }
