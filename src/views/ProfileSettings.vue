@@ -12,12 +12,9 @@ const router = useRouter();
 const userStore = useUserStore();
 const currentUser = computed({
   get() {
-    const editUser = Object.assign(userStore.currentUser!);
-    return editUser;
+    return Object.assign(userStore.currentUser!);
   },
-  set(value) {
-    currentUser.value = value;
-  },
+  set() {}
 });
 
 const educationLevels: string[] = [
@@ -247,7 +244,7 @@ const returnBack = () => {
           class="btn text-none mt-5"
           width="250"
           height="45"
-          color="green"
+          color="blue"
           flat
           @click="isDisabledPersonalData = false"
         >
@@ -258,7 +255,7 @@ const returnBack = () => {
           class="btn text-none mt-5"
           width="200"
           height="45"
-          color="blue"
+          color="green"
           flat
           @click="savePersonalDataChange"
         >
@@ -285,7 +282,7 @@ const returnBack = () => {
             </v-btn>
           </v-card-title>
           <v-card-text>
-            Удаление аккаунта приведет к потере прогресса в курсах. Вы точно хотите удалить аккаунт?
+            Удаление аккаунта приведет к потере прогресса в курсах и доступа к платным курсам. Вы точно хотите удалить аккаунт?
           </v-card-text>
           <v-card-actions>
             <v-btn
@@ -325,7 +322,7 @@ const returnBack = () => {
             clearable
           />
         </div>
-        <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
+        <v-btn class="btn text-none mt-5" width="200" height="45" color="green" flat type="submit">
           Сохранить изменения
         </v-btn>
       </v-form>
@@ -384,7 +381,7 @@ const returnBack = () => {
             @click:append-inner="showRepeatedPassword = !showRepeatedPassword"
           />
         </div>
-        <v-btn class="btn text-none mt-5" width="200" height="45" color="blue" flat type="submit">
+        <v-btn class="btn text-none mt-5" width="200" height="45" color="green" flat type="submit">
           Сохранить изменения
         </v-btn>
       </v-form>

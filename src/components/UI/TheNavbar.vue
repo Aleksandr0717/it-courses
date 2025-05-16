@@ -152,34 +152,39 @@ const fullShortName = computed(() => {
           </v-list>
         </v-card>
       </v-menu>
-      <v-menu>
-        <template #activator="{ props }">
-          <v-btn
-            class="btn-mobile text-none pa-0"
-            min-width="40"
-            height="50"
-            tile
-            :ripple="false"
-            v-bind="props"
-            icon="mdi-menu"
-          />
-        </template>
-        <v-card width="150" elevation="5" tile>
-          <v-list class="pa-0">
-            <v-list-item
-              v-for="language in listOfLanguagesMobile"
-              :key="language.id"
-              :value="language.id"
-              :color="language.color"
-              min-height="32"
-              rounded="0"
-              @click="language.action"
-            >
-              <v-list-item-title>{{ language.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
+      <div class="ga-1 mobile">
+        <v-menu>
+          <template #activator="{ props }">
+            <v-btn
+              class="btn-mobile text-none pa-0"
+              min-width="40"
+              height="50"
+              tile
+              :ripple="false"
+              v-bind="props"
+              icon="mdi-menu"
+            />
+          </template>
+          <v-card width="150" elevation="5" tile>
+            <v-list class="pa-0">
+              <v-list-item
+                v-for="language in listOfLanguagesMobile"
+                :key="language.id"
+                :value="language.id"
+                :color="language.color"
+                min-height="32"
+                rounded="0"
+                @click="language.action"
+              >
+                <v-list-item-title>{{ language.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
+        <div class="img-bg">
+            <img src="https://static.thenounproject.com/png/6135611-84.png" alt="Лого" height="33" />
+        </div>
+      </div>
     </div>
     <VSpacer />
     <v-btn
@@ -254,15 +259,21 @@ const fullShortName = computed(() => {
       background-color: rgb(119, 119, 119);
     }
   }
-  .btn-mobile {
-    display: none;
+  .mobile {
+    display: none !important;
   }
   @media (max-width: 425px) {
     .btn {
       display: none;
     }
-    .btn-mobile {
-      display: block;
+    .mobile {
+      display: flex !important;
+      height: 50px;
+      align-items: center;
+      .img-bg {
+        width: 33px;
+        height: 33px;
+      }
     }
     .btn-login {
       margin: 5px !important;

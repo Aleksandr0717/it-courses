@@ -22,7 +22,7 @@ onMounted(async () => {
   isLoading.value = false;
 })
 
-const selectedDifficultyLevel = ref<number[]>([4]);
+const selectedDifficultyLevel = ref<string[]>(['4']);
 const isFreeCourses = ref(false);
 const searchQueryforPython = ref('');
 const searchQueryforJS = ref('');
@@ -31,7 +31,7 @@ const isEditedCourseInfo = ref(false);
 const visibleFilter = ref(false);
 
 const filterByDifficultyLevel = (list: Ref<ICourseInfo[]>): ICourseInfo[] => {
-  if (selectedDifficultyLevel.value.includes(4)) {
+  if (selectedDifficultyLevel.value.includes('4')) {
     return list.value;
   } else {
     return list.value.filter((course: ICourseInfo) => selectedDifficultyLevel.value.includes(course.level));
@@ -46,9 +46,9 @@ const sortByTitle = (list: ComputedRef<ICourseInfo[]>, searchQuery: Ref<string>)
   return list.value.filter((course: ICourseInfo) => course.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
 };
 
-const updateCourseTitleCard = async (course: ICourseInfo): Promise<void> => {
+const updateCourseTitleCard = async (list: Ref<ICourseInfo[]>, course: ICourseInfo): Promise<void> => {
   await coursesStore.UPDATE_COURSE_TITLE(course);
-  listOfPythonCourses.value[listOfPythonCourses.value.findIndex((item) => item.id === course.id)]=course;
+  list.value[list.value.findIndex((item) => item.id === course.id)] = course;
   isEditedCourseInfo.value = false;
 };
 
@@ -69,6 +69,18 @@ const filteredByFreeCsharpCoursesList = computed(() => filterByFree(filteredByDi
 const sortedPythonCoursesList = computed(() => sortByTitle(filteredByFreePythonCoursesList, searchQueryforPython));
 const sortedJSCoursesList = computed(() => sortByTitle(filteredByFreeJSCoursesList, searchQueryforJS));
 const sortedCsharpCoursesList = computed(() => sortByTitle(filteredByFreeCsharpCoursesList, searchQueryforCsharp));
+
+const updatePythonTitleCard = async (course: ICourseInfo): Promise<void> => {
+  await updateCourseTitleCard(listOfPythonCourses, course);
+};
+
+const updateJSTitleCard = async (course: ICourseInfo): Promise<void> => {
+  await updateCourseTitleCard(listOfJSCourses, course);
+};
+
+const updateCsharpTitleCard = async (course: ICourseInfo): Promise<void> => {
+  await updateCourseTitleCard(listOfCsharpCourses, course);
+};
 
 const deletePythonTitleCard = async (id: number): Promise<void> => {
   await deleteCourseTitleCard(id, listOfPythonCourses);
@@ -110,7 +122,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
           <div class="ml-6">
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="4"
+              value="4"
               hide-details
               color="green"
               density="compact"
@@ -121,7 +133,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="1"
+              value="1"
               hide-details
               color="green"
               density="compact"
@@ -132,7 +144,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="2"
+              value="2"
               hide-details
               color="green"
               density="compact"
@@ -143,7 +155,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             </v-checkbox>
             <v-checkbox
               v-model="selectedDifficultyLevel"
-              :value="3"
+              value="3"
               hide-details
               color="green"
               density="compact"
@@ -195,7 +207,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             :course="course"
             @edit-card="(value) => isEditedCourseInfo = value"
             @click="clickOnCource(course)"
-            @update-info="updateCourseTitleCard"
+            @update-info="updatePythonTitleCard"
             @delete-course="deletePythonTitleCard"
           />
         </transition-group>
@@ -227,7 +239,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             :course="course"
             @edit-card="(value) => isEditedCourseInfo = value"
             @click="clickOnCource(course)"
-            @update-info="updateCourseTitleCard"
+            @update-info="updateJSTitleCard"
             @delete-course="deleteJSTitleCard"
           />
         </transition-group>
@@ -259,7 +271,7 @@ const clickOnCource = (course: ICourseInfo): void =>{
             :course="course"
             @edit-card="(value) => isEditedCourseInfo = value"
             @click="clickOnCource(course)"
-            @update-info="updateCourseTitleCard"
+            @update-info="updateCsharpTitleCard"
             @delete-course="deleteCsharpTitleCard"
           />
         </transition-group>

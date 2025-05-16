@@ -2,29 +2,17 @@
 import type { ICourseInfo } from '@/interfaces';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useUserStore } from '@/stores/UserStore';
-import { useCoursesStore } from '@/stores/CoursesStore';
-import { courseLevel, findTitle } from '@/enums';
+import { courseLevel, findTitle } from '@/use/EnumOfDifficultyLevels';
 
-const coursesStore = useCoursesStore();
 const userStore = useUserStore();
 const currentUser = computed(() => userStore.currentUser);
-const alertMessage = computed({
-  get: () => coursesStore.alertMessage,
-  set: (value) => coursesStore.alertMessage = value
-});
 
 const props = defineProps<{
   course: ICourseInfo
 }>();
 const emit = defineEmits(['updateInfo', 'deleteCourse', 'editCard']);
 
-const duplicatedCourseData = computed({
-  get() {
-    return Object.assign({}, props.course);
-  },
-  set() {
-  }
-});
+const duplicatedCourseData = ref(Object.assign({}, props.course))
 const isEditedCourseInfo = ref(false);
 const confirmDialog = ref(false);
 const form = useTemplateRef<HTMLFormElement>('form');
@@ -50,19 +38,17 @@ const editCard = () => {
 };
 
 const closeEditor = () => {
-  alertMessage.value = { type: 'warning', message: 'Изменения не сохранены в базе' };
-  setTimeout(() => alertMessage.value = null, 3000);
   isEditedCourseInfo.value = false;
   emit('editCard', false);
 };
 
-const findColor = (id: number) => {
-  return courseLevel.find((item) => item.id === id)?.color;
+const findColor = (id: string) => {
+  return courseLevel.find((item) => item.id === parseInt(id))?.color;
 };
 </script>
 
 <template>
-  <div :class="{'card': !isEditedCourseInfo}">
+  <div :class="{ 'card': !isEditedCourseInfo }">
     <v-form ref="form" class="desc-card d-flex ga-6 mb-3">
       <VTextarea
         v-if="isEditedCourseInfo"
@@ -209,17 +195,12 @@ const findColor = (id: number) => {
             density="compact"
             hide-details="auto"
             placeholder="Выберите уровень сложности"
-            :items="[1, 2, 3]"
+            :items="['1', '2', '3']"
             variant="outlined"
             open-on-clear
             :rules="[(v) => !!v || 'Поле обязательно для заполнения']"
           />
-          <v-chip
-            v-else
-            :color="findColor(course.level)"
-            variant="flat"
-            size="small"
-          >
+          <v-chip v-else :color="findColor(course.level)" variant="flat" size="small">
             {{ findTitle(course.level) }}
           </v-chip>
         </div>

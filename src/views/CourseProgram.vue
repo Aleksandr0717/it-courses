@@ -4,7 +4,7 @@ import { useCoursesStore } from '@/stores/CoursesStore';
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
 import type { ICourseProgram, IProgramDesc } from '@/interfaces';
-import { findTitle } from '@/enums';
+import { findTitle } from '@/use/EnumOfDifficultyLevels';
 import PageLoader from '@/components/UI/PageLoader.vue';
 
 const courseProgram = ref<ICourseProgram | null>(null);
@@ -14,7 +14,9 @@ const coursesStore = useCoursesStore();
 const userStore = useUserStore();
 const currentUser = computed(() => userStore.currentUser);
 const isLoading = ref(false);
-const isUserSignedUp = computed(() => userStore.currentUser?.courses.includes(courseProgram.value!?.customId));
+const isUserSignedUp = computed(() =>
+  userStore.currentUser?.courses.includes(courseProgram.value!?.customId),
+);
 
 const signUpForCourse = async () => {
   await userStore.SIGN_UP_FOR_COURSE(currentUser.value!, courseProgram.value!);
@@ -24,9 +26,9 @@ onMounted(async () => {
   isLoading.value = true;
   courseProgram.value = await coursesStore.GET_COURSE_PROGRAM(parseInt(route.hash.slice(1)));
   listOfProgramDesc.value = courseProgram.value!.program?.map((str: string) => {
-    const splitArr = str.split(':')
-    return { title: splitArr[0], desc: splitArr[1].split(';') }
-  });
+    const splitArr = str.split(':');
+    return { title: splitArr[0], desc: splitArr[1].split(';') };
+  })
   document.title = courseProgram.value!.title;
   isLoading.value = false;
 });
@@ -38,19 +40,28 @@ onMounted(async () => {
     <div v-else class="header d-flex justify-center py-10">
       <div class="header-center d-flex align-center justify-start">
         <div class="back-btn mr-4">
-        <VBtn variant="text" tile width="40" height="30" icon="mdi-arrow-left" @click="$router.back()" />
+          <VBtn
+            variant="text"
+            tile
+            width="40"
+            height="30"
+            icon="mdi-arrow-left"
+            @click="$router.back()"
+          />
         </div>
         <div class="header-center-title d-flex justify-center align-lg-start flex-column ga-4">
           <h2>{{ courseProgram?.title }}</h2>
           <p>{{ courseProgram?.description }}</p>
         </div>
         <VSpacer />
-        <img :src="courseProgram?.img" alt="Лого" height="140">
+        <img :src="courseProgram?.img" alt="Лого" height="140" />
       </div>
     </div>
     <div v-if="!isLoading" class="content mt-10 d-flex justify-center">
       <div class="content-center d-flex align-start justify-space-between">
-        <div class="content-center-detailed-info d-flex justify-center flex-column ga-12 px-14 mb-10">
+        <div
+          class="content-center-detailed-info d-flex justify-center flex-column ga-12 px-14 mb-10"
+        >
           <div v-if="courseProgram?.skills" class="d-flex ga-3 flex-column">
             <h3>Вы научитесь:</h3>
             <ul>
@@ -59,8 +70,10 @@ onMounted(async () => {
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>О курсе:</h3>
-            <p v-if="typeof courseProgram?.about === 'object'"
-              v-for="(str, i) in courseProgram.about" :key="i"
+            <p
+              v-if="typeof courseProgram?.about === 'object'"
+              v-for="(str, i) in courseProgram.about"
+              :key="i"
             >
               {{ str }}
             </p>
@@ -68,8 +81,10 @@ onMounted(async () => {
           </div>
           <div class="d-flex flex-column ga-3">
             <h3>Начальные требования:</h3>
-            <p v-if="typeof courseProgram?.requirements === 'object'"
-              v-for="(str, i) in courseProgram.requirements" :key="i"
+            <p
+              v-if="typeof courseProgram?.requirements === 'object'"
+              v-for="(str, i) in courseProgram.requirements"
+              :key="i"
             >
               {{ str }}
             </p>
@@ -77,9 +92,19 @@ onMounted(async () => {
           </div>
           <div v-if="listOfProgramDesc?.length" class="d-flex flex-column">
             <h3 class="mb-3">Программа курса:</h3>
-            <v-expansion-panels v-for="(elem, i) in listOfProgramDesc" :key="i" variant="accordion" multiple elevation="0">
-              <v-expansion-panel >
-                <v-expansion-panel-title collapse-icon="mdi-minus" expand-icon="mdi-plus" class="panel-title px-1">
+            <v-expansion-panels
+              v-for="(elem, i) in listOfProgramDesc"
+              :key="i"
+              variant="accordion"
+              multiple
+              elevation="0"
+            >
+              <v-expansion-panel>
+                <v-expansion-panel-title
+                  collapse-icon="mdi-minus"
+                  expand-icon="mdi-plus"
+                  class="panel-title px-1"
+                >
                   {{ elem.title }}
                 </v-expansion-panel-title>
                 <VDivider />
@@ -95,7 +120,7 @@ onMounted(async () => {
         <div class="content-center-general-info d-flex flex-column pr-4">
           <div class="mb-3">
             <h4>{{ courseProgram?.price }}</h4>
-            <h4>{{ findTitle(courseProgram?.level) }}</h4>
+            <h4>{{ findTitle(courseProgram!?.level) }}</h4>
           </div>
           <div class="quantity pa-3 mb-5">
             <h4>В курс входят:</h4>
@@ -114,10 +139,20 @@ onMounted(async () => {
             >
               Записаться на курс
             </v-btn>
-            <v-btn v-else class="btn text-none" flat color="blue" width="200" @click="signUpForCourse">Оплатить курс</v-btn>
+            <v-btn
+              v-else
+              class="btn text-none"
+              flat
+              color="blue"
+              width="200"
+              @click="signUpForCourse"
+              >Оплатить курс</v-btn
+            >
           </div>
           <div v-else>
-            <v-btn class="btn text-none" flat color="green" width="200" disabled>Вы уже записаны</v-btn>
+            <v-btn class="btn text-none" flat color="green" width="200" disabled
+              >Вы уже записаны</v-btn
+            >
           </div>
         </div>
       </div>
@@ -186,7 +221,7 @@ $bg-color: rgb(233, 233, 233);
         ul {
           list-style: none;
           li::before {
-            content: "✓";
+            content: '✓';
             margin-right: 10px;
             color: green;
           }
@@ -198,7 +233,7 @@ $bg-color: rgb(233, 233, 233);
           ul {
             list-style: none;
             li::before {
-              content: "\203A";
+              content: '\203A';
               margin-right: 10px;
               color: black;
             }
@@ -221,7 +256,7 @@ $bg-color: rgb(233, 233, 233);
           ul {
             list-style: none;
             li::before {
-              content: "\203A";
+              content: '\203A';
               margin-right: 10px;
             }
           }

@@ -24,7 +24,7 @@ export interface ICourseType extends INavMenu {
 export interface ICourseInfo extends ICourseType {
   authors: string
   price: string
-  level: number
+  level: string
   courseTypeTitle: string[]
   customId: string
   courseType: string[]
@@ -62,7 +62,7 @@ export interface ICourseProgram extends IResponse {
   about: string
   requirements: string
   price: string
-  level: number
+  level: string
   program: string[]
 }
 

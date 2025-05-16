@@ -7,7 +7,7 @@ import PageLoader from '@/components/UI/PageLoader.vue';
 document.title = 'Профиль';
 const userStore = useUserStore();
 const currentUser = computed(() => userStore.currentUser);
-const tableHeader = ['Имя и фамилия', 'Логин', 'User Id', 'Всего курсов'];
+const tableHeader = ['Имя и фамилия', 'Логин', 'Всего курсов'];
 
 
 const nameAndFamily = computed(() => {
@@ -42,7 +42,6 @@ const coursesCount = computed(() => {
             <tr>
               <td>{{ nameAndFamily }}</td>
               <td>{{ '@' + currentUser?.login }}</td>
-              <td>{{ currentUser?.id }}</td>
               <td>{{ coursesCount }}</td>
             </tr>
           </tbody>

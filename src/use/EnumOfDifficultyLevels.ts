@@ -16,6 +16,6 @@ export const courseLevel = [
   }
 ]
 
-export const findTitle = (id: number) => {
-  return courseLevel.find((item) => item.id === id)?.title;
+export const findTitle = (id: string) => {
+  return courseLevel.find((item) => item.id === parseInt(id))?.title;
 };
