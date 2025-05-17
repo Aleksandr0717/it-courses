@@ -2,4 +2,4 @@
 
 Контрольная по разработке веб-приложений.
 
-Стек: Vue3 (Composition API), Pinia, Airtable, TypeScript (не полностью)
+Стек: Vue3 (Composition API), Pinia, Airtable, TypeScript (кроме серверной части)
