@@ -7,7 +7,7 @@ import type { ICourseProgram, IProgramDesc } from '@/interfaces';
 import { findTitle } from '@/use/EnumOfDifficultyLevels';
 import PageLoader from '@/components/UI/PageLoader.vue';
 
-const courseProgram = ref<ICourseProgram | null>(null);
+const courseProgram = ref<ICourseProgram>();
 const listOfProgramDesc = ref<IProgramDesc[]>([]);
 const route = useRoute();
 const coursesStore = useCoursesStore();

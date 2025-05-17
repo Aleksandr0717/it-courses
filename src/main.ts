@@ -9,7 +9,7 @@ import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import { registerServices } from '@/plugins/api/index.js';
+import { registerServices } from '@/plugins/api/index';
 
 const vuetify = createVuetify({
   icons: {

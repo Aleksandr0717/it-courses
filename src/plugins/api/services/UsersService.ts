@@ -1,4 +1,4 @@
-import { API_BASE_URL, fetchData } from "../apiConfig.js";
+import { API_BASE_URL, fetchData } from "../apiConfig";
 
 class UserService {
 
@@ -6,15 +6,15 @@ class UserService {
     return fetchData(`${API_BASE_URL}/users`);
   }
 
-  async authorizationUser(login, password) {
+  async authorizationUser(login: string, password: string) {
     return fetchData(`${API_BASE_URL}/users/login?login=${login}&password=${password}`);
   }
 
-  async getUserById(userId) {
+  async getUserById(userId: number) {
     return fetchData(`${API_BASE_URL}/users/${userId}`);
   }
 
-  async createUser(userData) {
+  async createUser(userData: {}) {
     return fetchData(`${API_BASE_URL}/users`, {
       method: "POST",
       headers: {
@@ -24,7 +24,7 @@ class UserService {
     });
   }
 
-  async updateUserData(userData) {
+  async updateUserData(userData: {}) {
     return fetchData(`${API_BASE_URL}/users`, {
       method: "PUT",
       headers: {

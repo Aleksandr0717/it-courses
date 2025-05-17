@@ -1,25 +1,25 @@
-import { API_BASE_URL, fetchData } from "../apiConfig.js";
+import { API_BASE_URL, fetchData } from "../apiConfig";
 
 class CourseService {
   async getCoursesType() {
     return fetchData(`${API_BASE_URL}/courses`);
   }
 
-  async getCourseTitle(courseType) {
+  async getCourseTitle(courseType: string) {
     return fetchData(`${API_BASE_URL}/courses/title/filtered?courseType=${courseType}`);
   }
 
-  async getCourseProgram(courseId) {
+  async getCourseProgram(courseId: number) {
     return fetchData(`${API_BASE_URL}/courses/title/program?courseId=${courseId}`);
   }
 
-  async updateCourseTitle(courseTitle) {
+  async updateCourseTitle(coursePayload: {}) {
     return fetchData(`${API_BASE_URL}/courses/title`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(courseTitle),
+      body: JSON.stringify(coursePayload),
     });
   }
 }

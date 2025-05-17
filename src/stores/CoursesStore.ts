@@ -8,7 +8,7 @@ export const useCoursesStore = defineStore('coursesStore', () => {
   const router = useRouter();
   const alertMessage = ref<IAlert | null>(null);
   
-  const GET_COURSES_TYPE = async (): Promise<ICourseType[] | any> => {
+  const GET_COURSES_TYPE = async (): Promise<ICourseType[] | undefined> => {
     try {
       const response: ICourseType[] = await courseService.getCoursesType();
       return response.map((courseTypeCard: ICourseType) => ({
@@ -20,7 +20,7 @@ export const useCoursesStore = defineStore('coursesStore', () => {
     }
   };
 
-  const GET_COURSES_TITLE = async (courseType: string): Promise<ICourseInfo[] | any> => {
+  const GET_COURSES_TITLE = async (courseType: string): Promise<ICourseInfo[] | undefined> => {
     try{
       const response: ICourseInfo[] = await courseService.getCourseTitle(courseType);
       return response.map((courseTitleCard: ICourseInfo) => ({
@@ -34,26 +34,26 @@ export const useCoursesStore = defineStore('coursesStore', () => {
     }
   };
   
-  const GET_COURSE_PROGRAM = async (courseId: number): Promise<ICourseProgram | any> => {
-    try {
-      const response: ICourseProgram[] = await courseService.getCourseProgram(courseId);
-      return response.map((courseProgram: ICourseProgram) => {
-        const reformateResponse: ICourseProgram | object = {};
-        for (const key of Object.keys(courseProgram)) {
-          if (typeof courseProgram[key] === 'object' && courseProgram[key].length === 1) {
-            reformateResponse[key] = courseProgram[key][0];
-          } else if (typeof courseProgram[key] === 'string' && courseProgram[key].includes('\n')) {
-            reformateResponse[key] = courseProgram[key].split('\n');
-          } else {
-            reformateResponse[key] = courseProgram[key];
-          }
+  const GET_COURSE_PROGRAM = async (courseId: number): Promise<ICourseProgram | undefined> => {
+  try {
+    const response: ICourseProgram[] = await courseService.getCourseProgram(courseId);
+    return response.map((courseProgram: ICourseProgram) => {
+      const reformateResponse = {} as ICourseProgram;
+      for (const key of Object.keys(courseProgram) as Array<keyof ICourseProgram>) {
+        if (Array.isArray(courseProgram[key]) && courseProgram[key].length === 1) {
+          reformateResponse[key] = courseProgram[key][0] as never;
+        } else if (typeof courseProgram[key] === 'string' && (courseProgram[key] as string).includes('\n')) {
+          reformateResponse[key] = (courseProgram[key] as string).split('\n') as never;
+        } else {
+          reformateResponse[key] = courseProgram[key] as never;
         }
-        return reformateResponse;
-      })[0];
-    } catch (error: any) {
-      console.error('Ошибка при получении программы курса: ', error.message);
-    }
-  };
+      }
+      return reformateResponse;
+    })[0];
+  } catch (error: any) {
+    console.error('Ошибка при получении программы курса: ', error.message);
+  }
+};  
   
   const UPDATE_COURSE_TITLE = async (courseTitle: ICourseInfo | undefined): Promise<void> => {
     const coursePayload = {
